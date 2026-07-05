@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Svoya Igra</title>
+    <style>
+        body { font-family: Arial; background: #1a1a2e; color: white; text-align: center; }
+        .container { max-width: 800px; margin: 50px auto; }
+        button { padding: 12px 24px; margin: 10px; font-size: 16px; cursor: pointer; border-radius: 8px; border: none; }
+        .blue { background: #007bff; color: white; }
+        .green { background: #28a745; color: white; }
+        input { padding: 10px; margin: 5px; border-radius: 5px; width: 200px; }
+        .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 20px; }
+        .cell { background: #007bff; padding: 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .cell.used { background: #555; cursor: default; }
+        .players { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .player { background: #2a2a4a; padding: 10px 20px; border-radius: 8px; }
+        #log { background: #111; padding: 10px; margin: 20px; max-height: 200px; overflow-y: auto; text-align: left; font-size: 12px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Svoya Igra</h1>
+    <div id="login">
+        <input id="roomInput" placeholder="Room code"><br>
+        <input id="nameInput" placeholder="Your name"><br>
+        <button class="blue" onclick="createRoom()">Create Room</button>
+        <button class="green" onclick="joinRoom()">Join Room</button>
+    </div>
+    <div id="game" style="display:none">
+        <h3>Room: <span id="roomCode"></span></h3>
+        <div class="players" id="players"></div>
+        <div id="controls"></div>
+        <div class="board" id="board"></div>
+    </div>
+    <div id="log">Log:<br></div>
+</div>
+
+<script>
+var ws, roomCode, playerId, isHost = false;
+
+function log(msg) {
+    document.getElementById('log').innerHTML += msg + '<br>';
+}
+
+async function createRoom() {
+    log('Creating room...');
+    try {
+        var resp = await fetch('http://localhost:8000/api/create_room', {method:'POST'});
+        var data = await resp.json();
+        document.getElementById('roomInput').value = data.room_code;
+        log('Room created: ' + data.room_code);
+    } catch(e) {
+        log('ERROR: ' + e.message);
+    }
+}
+
+function joinRoom() {
+    roomCode = document.getElementById('roomInput').value.trim();
+    var name = document.getElementById('nameInput').value.trim() || 'Player';
+    if (!roomCode) { log('Enter room code!'); return; }
+    
+    playerId = Math.random().toString(36).substr(2, 8);
+    log('Connecting to ' + roomCode + ' as ' + name + '...');
+    
+    ws = new WebSocket('ws://localhost:8000/ws/' + roomCode + '/' + playerId);
+    
+    ws.onopen = function() {
+        log('Connected!');
+        ws.send(JSON.stringify({type:'join', name:name}));
+    };
+    
+    ws.onmessage = function(event) {
+        var msg = JSON.parse(event.data);
+        log('Received: ' + msg.type);
+        
+        if (msg.type === 'room_state') {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            document.getElementById('roomCode').textContent = roomCode;
+            updatePlayers(msg.players);
+            if (!msg.creator) {
+                document.getElementById('controls').innerHTML = '<button class="blue" onclick="becomeHost()">Become Host</button>';
+            }
+        }
+        
+        if (msg.type === 'game_state') {
+            renderBoard(msg.game);
+        }
+    };
+    
+    ws.onerror = function(e) {
+        log('WebSocket error');
+    };
+    
+    ws.onclose = function() {
+        log('Disconnected');
+    };
+}
+
+function becomeHost() {
+    ws.send(JSON.stringify({type:'set_creator'}));
+    isHost = true;
+    log('You are host now');
+    document.getElementById('controls').innerHTML = '<button class="green" onclick="startGame()">Start Game</button>';
+}
+
+function startGame() {
+    ws.send(JSON.stringify({type:'start_game'}));
+    log('Game starting...');
+}
+
+function updatePlayers(players) {
+    var html = '';
+    for (var id in players) {
+        var p = players[id];
+        html += '<div class="player">' + p.name + ': ' + p.score + '</div>';
+    }
+    document.getElementById('players').innerHTML = html;
+}
+
+function renderBoard(game) {
+    var round = game.rounds[game.current_round];
+    var html = '';
+    for (var i = 0; i < round.prices.length; i++) {
+        for (var j = 0; j < round.categories.length; j++) {
+            var cat = round.categories[j];
+            var price = round.prices[i];
+            var key = cat + '_' + price;
+            var exists = round.questions[key];
+            html += '<div class="cell' + (exists ? '' : ' used') + '" onclick="' + (exists ? 'selectQuestion(\'' + cat + '\',' + price + ')' : '') + '">' + (exists ? price : '') + '</div>';
+        }
+    }
+    document.getElementById('board').innerHTML = html;
+}
+
+function selectQuestion(cat, price) {
+    ws.send(JSON.stringify({type:'select_question', category:cat, price:price}));
+    log('Selected: ' + cat + ' - ' + price);
+}
+</script>
+</body>
+</html>
