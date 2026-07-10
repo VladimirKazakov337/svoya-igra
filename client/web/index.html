@@ -150,17 +150,17 @@ function renderGame(msg){ window._gameState = msg;
     if(!game._finalThemes) game._finalThemes = game.final.map(function(f,i){return {name:f.name||('Theme '+(i+1)), text:f.text, answer:f.answer, qmedia:f.qmedia, amedia:f.amedia, index:i, eliminated:false}});
     var activeThemes = game._finalThemes.filter(function(t){return !t.eliminated});
     var bh = '';
-    if(activeThemes.length > 1){
-      for(var t=0;t<game._finalThemes.length;t++){
-        var theme = game._finalThemes[t];
-        if(theme.eliminated) continue;
-        bh += '<div class="bcell" style="background:#ff9800;font-size:14px" onclick="eliminateTheme('+theme.index+')">'+theme.name+'</div>';
+    for(var i=0;i<2;i++){
+      for(var j=0;j<5;j++){
+        var idx = i*5+j;
+        if(idx >= game._finalThemes.length) break;
+        var th = game._finalThemes[idx];
+        if(th.eliminated){ bh+='<div class="bcell used"></div>'; continue; }
+        var last = activeThemes.length===1;
+        bh+='<div class="bcell" style="'+(last?'background:#28a745':'background:#ff9800')+'" onclick="'+(last?'showFinalQuestion('+th.index+')':'eliminateTheme('+th.index+')')+'">'+th.name+'</div>';
       }
-    } else if(activeThemes.length === 1){
-      var last = activeThemes[0];
-      bh = '<div class="bcell" style="background:#ff9800;font-size:16px;cursor:pointer" onclick="showFinalQuestion('+last.index+')">'+last.name+'</div>';
     }
-    document.getElementById('gboard').innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:40px">'+bh+'</div>';
+    document.getElementById('gboard').innerHTML=bh;
     document.getElementById('btn-next').style.display='none';
     document.getElementById('overlay').style.display='none';
     return;
