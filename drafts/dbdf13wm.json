@@ -1,0 +1,692 @@
+{
+  "rounds": [
+    {
+      "name": "Round 1",
+      "categories": [
+        {
+          "name": "кошки",
+          "questions": [
+            {
+              "price": 100,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "/uploads/e4289d209641453cb2052875c7a420a3_Statue_of_Liberty_(6279263029).jpg",
+              "amedia": "/uploads/225fb95188134f9a9901716766cda72c_Statue_of_Liberty_(6279263029).jpg"
+            },
+            {
+              "price": 200,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 300,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 400,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 500,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "собаки",
+          "questions": [
+            {
+              "price": 100,
+              "text": "кто ты",
+              "answer": "кто тыкто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 200,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 300,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 400,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 500,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "птицы",
+          "questions": [
+            {
+              "price": 100,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 200,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 300,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 400,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 500,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "крабы",
+          "questions": [
+            {
+              "price": 100,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 200,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 300,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 400,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 500,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "улитки",
+          "questions": [
+            {
+              "price": 100,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 200,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 300,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 400,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 500,
+              "text": "кто ты",
+              "answer": "кто ты",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Round 2",
+      "categories": [
+        {
+          "name": "Theme 1",
+          "questions": [
+            {
+              "price": 200,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 800,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1000,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "Theme 2",
+          "questions": [
+            {
+              "price": 200,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 800,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1000,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "Theme 3",
+          "questions": [
+            {
+              "price": 200,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 800,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1000,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "Theme 4",
+          "questions": [
+            {
+              "price": 200,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 800,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1000,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "Theme 5",
+          "questions": [
+            {
+              "price": 200,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 800,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1000,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Round 3",
+      "categories": [
+        {
+          "name": "Theme 1",
+          "questions": [
+            {
+              "price": 300,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 900,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1200,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1500,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "Theme 2",
+          "questions": [
+            {
+              "price": 300,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 900,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1200,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1500,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "Theme 3",
+          "questions": [
+            {
+              "price": 300,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 900,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1200,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1500,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "Theme 4",
+          "questions": [
+            {
+              "price": 300,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 900,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1200,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1500,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        },
+        {
+          "name": "Theme 5",
+          "questions": [
+            {
+              "price": 300,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 900,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1200,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            },
+            {
+              "price": 1500,
+              "text": "",
+              "answer": "",
+              "qmedia": "",
+              "amedia": ""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "final": [
+    {
+      "name": "Theme 1",
+      "text": "уууууууа",
+      "answer": "аааааац",
+      "qmedia": "",
+      "amedia": ""
+    },
+    {
+      "name": "Theme 2",
+      "text": "",
+      "answer": "",
+      "qmedia": "",
+      "amedia": ""
+    },
+    {
+      "name": "Theme 3",
+      "text": "",
+      "answer": "",
+      "qmedia": "",
+      "amedia": ""
+    },
+    {
+      "name": "Theme 4",
+      "text": "",
+      "answer": "",
+      "qmedia": "",
+      "amedia": ""
+    },
+    {
+      "name": "Theme 5",
+      "text": "",
+      "answer": "",
+      "qmedia": "",
+      "amedia": ""
+    },
+    {
+      "name": "Theme 6",
+      "text": "",
+      "answer": "",
+      "qmedia": "",
+      "amedia": ""
+    },
+    {
+      "name": "Theme 7",
+      "text": "",
+      "answer": "",
+      "qmedia": "",
+      "amedia": ""
+    },
+    {
+      "name": "Theme 8",
+      "text": "",
+      "answer": "",
+      "qmedia": "",
+      "amedia": ""
+    },
+    {
+      "name": "Theme 9",
+      "text": "",
+      "answer": "",
+      "qmedia": "",
+      "amedia": ""
+    },
+    {
+      "name": "Theme 10",
+      "text": "",
+      "answer": "",
+      "qmedia": "",
+      "amedia": ""
+    }
+  ],
+  "name": "игра52"
+}

@@ -96,7 +96,7 @@ body{font-family:Arial;background:#1a1a2e;color:white;min-height:100vh}
 <button class="btn btn-green" id="btn-yes" style="display:none;font-size:18px" onclick="evalA(true)">+ Correct</button>
 <button class="btn btn-red" id="btn-no" style="display:none;font-size:18px" onclick="evalA(false)">- Wrong</button>
 <button class="btn btn-gray" id="btn-skip" style="display:none" onclick="skipQ()">Skip</button>
-<button class="btn btn-blue" id="btn-next" style="display:none;font-size:18px" onclick="nextR()">Next Round</button>
+<button class="btn btn-blue" id="btn-next" style="display:none;font-size:18px" onclick="nextR()">Next Round</button> <button class="btn btn-gray" style="font-size:12px" onclick="skipToFinal()">Skip to Final</button>
 </div>
 </div>
 
@@ -142,12 +142,25 @@ async function startGame(){T.name=document.getElementById('gameName').value||'My
 function launchGame(){ws.send(JSON.stringify({type:'start_game'}));document.getElementById('btn-start-game').textContent='Starting...';document.getElementById('btn-start-game').disabled=true}
 
 // ========== GAME RENDER ==========
-function renderGame(msg){
+function renderGame(msg){ window._gameState = msg; 
   var game=msg.game,players=msg.players;
   if(game.phase==='final'){
     document.getElementById('rname').textContent='FINAL ROUND';
     document.getElementById('gplayers').innerHTML='';
-    document.getElementById('gboard').innerHTML='<div style="text-align:center;padding:50px"><h2>Final Round</h2><p>10 themes ready</p></div>';
+    if(!game._finalThemes) game._finalThemes = game.final.map(function(f,i){return {name:f.name||('Theme '+(i+1)), text:f.text, answer:f.answer, qmedia:f.qmedia, amedia:f.amedia, index:i, eliminated:false}});
+    var activeThemes = game._finalThemes.filter(function(t){return !t.eliminated});
+    var bh = '';
+    if(activeThemes.length > 1){
+      for(var t=0;t<game._finalThemes.length;t++){
+        var theme = game._finalThemes[t];
+        if(theme.eliminated) continue;
+        bh += '<div class="bcell" style="background:#ff9800;font-size:14px" onclick="eliminateTheme('+theme.index+')">'+theme.name+'</div>';
+      }
+    } else if(activeThemes.length === 1){
+      var last = activeThemes[0];
+      bh = '<div class="bcell" style="background:#ff9800;font-size:16px;cursor:pointer" onclick="showFinalQuestion('+last.index+')">'+last.name+'</div>';
+    }
+    document.getElementById('gboard').innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:40px">'+bh+'</div>';
     document.getElementById('btn-next').style.display='none';
     document.getElementById('overlay').style.display='none';
     return;
@@ -182,7 +195,7 @@ function renderGame(msg){
     document.getElementById('overlay').style.display='none';
   }
   
-  // Нижняя панель — только кнопка Next Round
+  // РќРёР¶РЅСЏСЏ РїР°РЅРµР»СЊ вЂ” С‚РѕР»СЊРєРѕ РєРЅРѕРїРєР° Next Round
   document.getElementById('btn-next').style.display=!q&&!Object.keys(round.questions).length&&game.phase==='playing'?'inline-block':'none';
   document.getElementById('ansname').textContent='';
 }
@@ -201,6 +214,45 @@ function showAnswerInOverlay(){
   document.getElementById('ov-btns').innerHTML = '<button class="btn btn-red" onclick="skipQ()" style="font-size:18px;padding:12px 30px">FINISH</button>';
 }
 function skipQ(){ws.send(JSON.stringify({type:'skip_question'}))}
+function eliminateTheme(idx){
+  if(!window._gameState) return;
+  var game = window._gameState.game;
+  if(!game._finalThemes) return;
+  game._finalThemes[idx].eliminated = true;
+  renderGame(window._gameState);
+}
+
+function showFinalQuestion(idx){
+  if(!window._gameState) return;
+  var game = window._gameState.game;
+  if(!game._finalThemes) return;
+  var theme = game._finalThemes[idx];
+  if(!theme){ alert('Theme not found'); return; }
+  window._finalTheme = theme;
+  document.getElementById('overlay').innerHTML = 
+    '<div class="overlay-box">'+
+    '<div style="font-size:28px;margin-bottom:20px">'+(theme.text||'No question')+'</div>'+
+    (theme.qmedia?'<img src="'+theme.qmedia+'" style="max-width:400px;max-height:300px;border-radius:10px;margin-bottom:20px">':'')+
+    '<button class="btn btn-orange" onclick="showFinalAnswer()" style="font-size:18px;padding:12px 30px;margin:10px">SHOW ANSWER</button>'+
+    '<button class="btn btn-gray" onclick="document.getElementById(\'overlay\').style.display=\'none\'" style="font-size:18px;padding:12px 30px;margin:10px">CLOSE</button>'+
+    '</div>';
+  document.getElementById('overlay').style.display='flex';
+}
+
+function showFinalAnswer(){
+  var t = window._finalTheme;
+  document.getElementById('overlay').innerHTML = 
+    '<div class="overlay-box">'+
+    '<div style="font-size:28px;color:#ff9800;font-weight:bold;margin-bottom:20px">'+t.answer+'</div>'+
+    (t.amedia?'<img src="'+t.amedia+'" style="max-width:400px;max-height:300px;border-radius:10px;margin-bottom:20px">':'')+
+    '<button class="btn btn-red" onclick="document.getElementById(\'overlay\').style.display=\'none\'" style="font-size:18px;padding:12px 30px;margin:10px">CLOSE</button>'+
+    '</div>';
+  document.getElementById('overlay').style.display='flex';
+}
+
+function skipToFinal(){
+  ws.send(JSON.stringify({type:'skip_to_final'}));
+}
 function nextR(){ws.send(JSON.stringify({type:'next_round'}))}
 </script>
 </body>
