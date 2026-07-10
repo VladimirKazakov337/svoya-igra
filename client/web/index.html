@@ -1,143 +1,194 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Svoya Igra</title>
-    <style>
-        body { font-family: Arial; background: #1a1a2e; color: white; text-align: center; }
-        .container { max-width: 800px; margin: 50px auto; }
-        button { padding: 12px 24px; margin: 10px; font-size: 16px; cursor: pointer; border-radius: 8px; border: none; }
-        .blue { background: #007bff; color: white; }
-        .green { background: #28a745; color: white; }
-        input { padding: 10px; margin: 5px; border-radius: 5px; width: 200px; }
-        .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 20px; }
-        .cell { background: #007bff; padding: 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .cell.used { background: #555; cursor: default; }
-        .players { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .player { background: #2a2a4a; padding: 10px 20px; border-radius: 8px; }
-        #log { background: #111; padding: 10px; margin: 20px; max-height: 200px; overflow-y: auto; text-align: left; font-size: 12px; border-radius: 8px; }
-    </style>
+<meta charset="UTF-8"><title>Svoya Igra</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial;background:#1a1a2e;color:white;min-height:100vh}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:bold}
+.btn-blue{background:#007bff;color:white}.btn-green{background:#28a745;color:white}.btn-orange{background:#ff9800;color:black}.btn-gray{background:#555;color:white}.btn-red{background:#dc3545;color:white}
+.topbar{background:#0a0a1e;padding:15px 20px;display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.topbar h1{font-size:22px}.topbar input{padding:10px;border-radius:6px;border:1px solid #555;background:#2a2a4a;color:white;font-size:14px}
+.tabs{background:#1a1a3e;padding:10px 20px;display:flex;gap:5px}
+.tabs button{padding:12px 20px;border:none;border-radius:8px;cursor:pointer;font-size:15px;font-weight:bold;background:#007bff;color:white}
+.tabs button.active{background:#ff9800;color:#000}
+.content{padding:20px;max-width:900px}
+.theme-block{background:#2a2a4a;padding:15px;margin:12px 0;border-radius:10px}
+.q-item{background:#111133;padding:12px;margin:8px 0;border-radius:8px;border-left:4px solid #ff9800}
+.q-price{font-size:20px;font-weight:bold;color:#ff9800}
+.q-row{display:flex;gap:10px;align-items:center;margin:4px 0}
+.q-row label{width:25px;color:#aaa;font-size:13px}
+.q-row input[type=text]{flex:1;padding:8px;border-radius:5px;border:1px solid #555;background:#1a1a3e;color:white}
+.preview{max-width:60px;max-height:40px;margin-left:5px;border-radius:4px}
+.drop-zone{border:2px dashed #555;padding:10px;border-radius:8px;text-align:center;color:#888;font-size:12px;cursor:pointer;min-height:35px;display:flex;align-items:center;justify-content:center}
+.drop-zone:hover,.drop-zone.dragover{border-color:#ff9800;color:#ff9800;background:#1a1a3e}
+.drop-zone.has-file{border-color:#28a745;color:#28a745}
+.actions{padding:20px;display:flex;gap:10px}
+.final-item{background:#2a2a4a;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ff9800}
+
+/* GAME SCREEN */
+#game-screen{display:none;flex-direction:column;height:100vh}
+.game-header{background:#0a0a1e;padding:15px 20px;display:flex;justify-content:space-between;align-items:center}
+.game-header h2{font-size:22px}
+.players-row{display:flex;gap:10px;padding:10px 20px;background:#1a1a3e;flex-wrap:wrap}
+.player-badge{background:#2a2a4a;padding:10px 15px;border-radius:8px;text-align:center;min-width:80px}
+.player-badge .pname{font-size:14px}
+.player-badge .pscore{font-size:22px;font-weight:bold}
+.pscore.plus{color:#28a745}.pscore.minus{color:#dc3545}
+.board-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:20px}
+.board-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:1000px;width:100%}
+.bcell{background:#007bff;border-radius:8px;cursor:pointer;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;min-height:65px;padding:10px;text-align:center}
+.bcell:hover{background:#0056b3}
+.bcell.used{background:#333;cursor:default;color:#666}
+.bcell.used:hover{background:#333}
+.bcell.selected{background:#ff9800;animation:pulse 1s infinite}
+.bcell.head{background:#ff9800;cursor:default;font-size:13px}
+.bcell.head:hover{background:#ff9800}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.ctrl-bar{background:#1a1a3e;padding:15px 20px;display:flex;align-items:center;gap:10px;min-height:70px}
+.ctrl-bar .answer-name{font-size:24px;font-weight:bold;color:#ff9800;flex:1;text-align:center}
+
+/* OVERLAY */
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:1000}
+.overlay-box{background:#1a1a2e;padding:40px;border-radius:20px;text-align:center;max-width:650px;width:90%}
+.overlay-box h2{color:#ff9800;font-size:36px;margin-bottom:10px}
+.overlay-box .big-price{font-size:56px;font-weight:bold;color:#28a745;margin:15px 0}
+.overlay-box .q-text{font-size:26px;margin:20px 0;line-height:1.4}
+.overlay-box img{max-width:400px;max-height:300px;border-radius:10px;margin:10px 0}
+.overlay-box audio{width:100%;margin:10px 0}
+</style>
 </head>
 <body>
-<div class="container">
-    <h1>Svoya Igra</h1>
-    <div id="login">
-        <input id="roomInput" placeholder="Room code"><br>
-        <input id="nameInput" placeholder="Your name"><br>
-        <button class="blue" onclick="createRoom()">Create Room</button>
-        <button class="green" onclick="joinRoom()">Join Room</button>
-    </div>
-    <div id="game" style="display:none">
-        <h3>Room: <span id="roomCode"></span></h3>
-        <div class="players" id="players"></div>
-        <div id="controls"></div>
-        <div class="board" id="board"></div>
-    </div>
-    <div id="log">Log:<br></div>
+
+<!-- START SCREEN -->
+<div id="start-screen" style="text-align:center;margin-top:120px">
+<h1 style="font-size:48px;margin-bottom:30px">Svoya Igra</h1>
+<button class="btn btn-blue" style="font-size:22px;padding:18px 40px;margin:10px" onclick="showEditor()">Create Game</button><br>
+<button class="btn btn-green" style="font-size:22px;padding:18px 40px;margin:10px" onclick="location.href='/player.html'">Join Game</button><br>
+<button class="btn btn-orange" style="font-size:18px;padding:14px 30px;margin:10px" onclick="loadDrafts()">My Drafts</button>
+<div id="drafts-list" style="margin-top:15px;text-align:left;max-width:400px;margin-left:auto;margin-right:auto"></div>
+</div>
+
+<!-- EDITOR -->
+<div id="editor-screen" style="display:none">
+<div class="topbar"><h1>Create Game</h1><input id="gameName" value="My Game"><input id="hostName" value="Host"></div>
+<div class="tabs" id="tabs"><button class="active" onclick="switchRound(0)">Round 1</button><button onclick="switchRound(1)">Round 2</button><button onclick="switchRound(2)">Round 3</button><button onclick="switchRound(3)">Final (10)</button></div>
+<div class="content" id="editor"></div>
+<div class="actions"><button class="btn btn-orange" onclick="saveDraft()">Save Draft</button><button class="btn btn-blue" onclick="startGame()">Start Game</button><button class="btn btn-gray" onclick="backToStart()">Back</button></div>
+</div>
+
+<!-- LOBBY -->
+<div id="lobby-screen" style="display:none;text-align:center;margin-top:80px">
+<h1>Room: <span id="rcode"></span></h1><h2 style="font-size:48px;letter-spacing:8px;margin:20px 0" id="rcodebig"></h2>
+<div id="lplayers"></div>
+<button class="btn btn-green" id="btn-start-game" style="font-size:20px;padding:15px 40px;margin-top:20px" onclick="launchGame()">START GAME</button>
+</div>
+
+<!-- GAME -->
+<div id="game-screen">
+<div class="game-header"><h2 id="rname"></h2><span>Host: <b id="hname-display"></b></span></div>
+<div class="players-row" id="gplayers"></div>
+<div class="board-wrap"><div class="board-grid" id="gboard"></div></div>
+<div class="ctrl-bar">
+<span class="answer-name" id="ansname"></span>
+<button class="btn btn-green" id="btn-open" style="display:none" onclick="openQ()">Open Question</button>
+<button class="btn btn-orange" id="btn-activate" style="display:none" onclick="activateA()">Activate Answer</button>
+<button class="btn btn-green" id="btn-yes" style="display:none;font-size:18px" onclick="evalA(true)">+ Correct</button>
+<button class="btn btn-red" id="btn-no" style="display:none;font-size:18px" onclick="evalA(false)">- Wrong</button>
+<button class="btn btn-gray" id="btn-skip" style="display:none" onclick="skipQ()">Skip</button>
+<button class="btn btn-blue" id="btn-next" style="display:none;font-size:18px" onclick="nextR()">Next Round</button>
+</div>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+<div class="overlay-box">
+<h2 id="ov-theme" style="display:none"></h2><div class="big-price" id="ov-price" style="display:none"></div>
+<div class="q-text" id="ov-text"></div><div id="ov-media"></div>
+<div id="ov-answerer" style="font-size:28px;font-weight:bold;color:#ff9800;margin:15px 0;display:none"></div><div id="ov-btns"></div><button class="btn btn-gray" onclick="document.getElementById('overlay').style.display='none'" style="margin-top:15px">Close</button>
+</div>
 </div>
 
 <script>
-var ws, roomCode, playerId, isHost = false;
+var T,prices=[[100,200,300,400,500],[200,400,600,800,1000],[300,600,900,1200,1500]],currentRound=0,ws,roomCode,playerId,joined=false;
 
-function log(msg) {
-    document.getElementById('log').innerHTML += msg + '<br>';
-}
+function showEditor(){document.getElementById('start-screen').style.display='none';document.getElementById('editor-screen').style.display='block'}
+function backToStart(){document.getElementById('editor-screen').style.display='none';document.getElementById('start-screen').style.display='block'}
 
-async function createRoom() {
-    log('Creating room...');
-    try {
-        var resp = await fetch('http://localhost:8000/api/create_room', {method:'POST'});
-        var data = await resp.json();
-        document.getElementById('roomInput').value = data.room_code;
-        log('Room created: ' + data.room_code);
-    } catch(e) {
-        log('ERROR: ' + e.message);
-    }
-}
+function initTemplate(){T={rounds:[],final:[],name:'My Game'};for(var r=0;r<3;r++){var cats=[];for(var c=0;c<5;c++){var qs=[];for(var q=0;q<5;q++)qs.push({price:prices[r][q],text:'',answer:'',qmedia:'',amedia:''});cats.push({name:'Theme '+(c+1),questions:qs})}T.rounds.push({name:'Round '+(r+1),categories:cats})}for(var i=0;i<10;i++)T.final.push({name:'Theme '+(i+1),text:'',answer:'',qmedia:'',amedia:''})}
+initTemplate();switchRound(0);
 
-function joinRoom() {
-    roomCode = document.getElementById('roomInput').value.trim();
-    var name = document.getElementById('nameInput').value.trim() || 'Player';
-    if (!roomCode) { log('Enter room code!'); return; }
+function switchRound(idx){currentRound=idx;var btns=document.querySelectorAll('#tabs button');btns.forEach(function(b,i){b.classList.remove('active');if(i===idx)b.classList.add('active')});renderRound(idx)}
+
+function renderRound(idx){var h='';if(idx<3){var round=T.rounds[idx];for(var c=0;c<round.categories.length;c++){var cat=round.categories[c];h+='<div class="theme-block"><input type="text" placeholder="Theme name" value="'+cat.name+'" onchange="T.rounds['+idx+'].categories['+c+'].name=this.value" style="font-weight:bold;font-size:16px;width:100%">';for(var q=0;q<cat.questions.length;q++){var qq=cat.questions[q];h+='<div class="q-item"><div class="q-price">'+qq.price+'</div><div class="q-row"><label>Q:</label><input type="text" placeholder="Question" value="'+esc(qq.text)+'" onchange="T.rounds['+idx+'].categories['+c+'].questions['+q+'].text=this.value"></div><div class="q-row"><label></label><div class="drop-zone" onclick="this.nextElementSibling.click()" ondrop="dropRound(event,'+idx+','+c+','+q+',\'q\',this)" ondragover="dragOver(event)" ondragleave="dragLeave(event)">'+(qq.qmedia?'File loaded':'Drop or click')+'</div><input type="file" style="display:none" onchange="upRound('+idx+','+c+','+q+',\'q\',this)">';if(qq.qmedia)h+='<img class="preview" src="'+qq.qmedia+'">';h+='</div><div class="q-row"><label>A:</label><input type="text" placeholder="Answer" value="'+esc(qq.answer)+'" onchange="T.rounds['+idx+'].categories['+c+'].questions['+q+'].answer=this.value"></div><div class="q-row"><label></label><div class="drop-zone" onclick="this.nextElementSibling.click()" ondrop="dropRound(event,'+idx+','+c+','+q+',\'a\',this)" ondragover="dragOver(event)" ondragleave="dragLeave(event)">'+(qq.amedia?'File loaded':'Drop or click')+'</div><input type="file" style="display:none" onchange="upRound('+idx+','+c+','+q+',\'a\',this)">';if(qq.amedia)h+='<img class="preview" src="'+qq.amedia+'">';h+='</div></div>'}h+='</div>'}}else{for(var i=0;i<T.final.length;i++){var f=T.final[i];h+='<div class="final-item"><h3>Theme '+(i+1)+'</h3><div class="q-row"><label>Q:</label><input type="text" placeholder="Question" value="'+esc(f.text)+'" onchange="T.final['+i+'].text=this.value"></div><div class="q-row"><label></label><div class="drop-zone" onclick="this.nextElementSibling.click()" ondrop="dropFinal(event,'+i+',\'q\',this)" ondragover="dragOver(event)" ondragleave="dragLeave(event)">'+(f.qmedia?'File loaded':'Drop or click')+'</div><input type="file" style="display:none" onchange="upFinal('+i+',\'q\',this)">';if(f.qmedia)h+='<img class="preview" src="'+f.qmedia+'">';h+='</div><div class="q-row"><label>A:</label><input type="text" placeholder="Answer" value="'+esc(f.answer)+'" onchange="T.final['+i+'].answer=this.value"></div><div class="q-row"><label></label><div class="drop-zone" onclick="this.nextElementSibling.click()" ondrop="dropFinal(event,'+i+',\'a\',this)" ondragover="dragOver(event)" ondragleave="dragLeave(event)">'+(f.amedia?'File loaded':'Drop or click')+'</div><input type="file" style="display:none" onchange="upFinal('+i+',\'a\',this)">';if(f.amedia)h+='<img class="preview" src="'+f.amedia+'">';h+='</div></div>'}}document.getElementById('editor').innerHTML=h}
+function esc(s){return s.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function dragOver(e){e.preventDefault();e.target.classList.add('dragover')}
+function dragLeave(e){e.target.classList.remove('dragover')}
+function dropRound(e,r,c,q,type,zone){e.preventDefault();zone.classList.remove('dragover');var f=e.dataTransfer.files[0];if(!f)return;var inp=zone.nextElementSibling;var dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;upRound(r,c,q,type,inp)}
+function dropFinal(e,i,type,zone){e.preventDefault();zone.classList.remove('dragover');var f=e.dataTransfer.files[0];if(!f)return;var inp=zone.nextElementSibling;var dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;upFinal(i,type,inp)}
+var activeDZ=null;document.addEventListener('mouseover',function(e){if(e.target.classList.contains('drop-zone'))activeDZ=e.target});document.addEventListener('paste',function(e){if(!activeDZ)return;var items=e.clipboardData.items;if(!items)return;for(var i=0;i<items.length;i++){if(items[i].type.indexOf('image')>=0||items[i].type.indexOf('audio')>=0){var f=items[i].getAsFile();var inp=activeDZ.nextElementSibling;if(inp&&inp.type==='file'){var dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;inp.dispatchEvent(new Event('change'));activeDZ.textContent='File loaded';activeDZ.classList.add('has-file')}e.preventDefault();break}}});
+
+async function upRound(r,c,q,type,input){var file=input.files[0];if(!file)return;var fd=new FormData();fd.append('file',file);var resp=await fetch('/api/upload',{method:'POST',body:fd});var d=await resp.json();if(type==='q')T.rounds[r].categories[c].questions[q].qmedia=d.url;else T.rounds[r].categories[c].questions[q].amedia=d.url;renderRound(r)}
+async function upFinal(i,type,input){var file=input.files[0];if(!file)return;var fd=new FormData();fd.append('file',file);var resp=await fetch('/api/upload',{method:'POST',body:fd});var d=await resp.json();if(type==='q')T.final[i].qmedia=d.url;else T.final[i].amedia=d.url;renderRound(3)}
+
+async function loadDrafts(){var r=await fetch('/api/drafts');var d=await r.json();var h='';if(!d.drafts||!d.drafts.length)h='<p>No drafts</p>';else for(var x of d.drafts)h+='<div style="padding:8px;cursor:pointer;background:#2a2a4a;margin:3px;border-radius:5px" onclick="openDraft(\''+x.id+'\')">'+x.name+'</div>';document.getElementById('drafts-list').innerHTML=h}
+async function openDraft(id){var r=await fetch('/api/draft/load',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})});var d=await r.json();if(d.template){T=d.template;showEditor();document.getElementById('gameName').value=T.name||'';switchRound(0)}}
+async function saveDraft(){T.name=document.getElementById('gameName').value||'My Game';var did=Math.random().toString(36).substr(2,8);await fetch('/api/draft/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:did,template:T})});alert('Draft saved!')}
+
+async function startGame(){T.name=document.getElementById('gameName').value||'My Game';var r=await fetch('/api/create_room',{method:'POST'});var d=await r.json();roomCode=d.room_code;await fetch('/api/save_template/'+roomCode,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(T)});playerId=Math.random().toString(36).substr(2,8);ws=new WebSocket('ws://'+window.location.hostname+':8000/ws/'+roomCode+'/'+playerId);ws.onopen=function(){ws.send(JSON.stringify({type:'join',name:document.getElementById('hostName').value||'Host'}))};joined=false;ws.onmessage=function(ev){var msg=JSON.parse(ev.data);
+  if(msg.type==='game_state'){document.getElementById('lobby-screen').style.display='none';document.getElementById('game-screen').style.display='flex';renderGame(msg);return}
+  if(msg.type==='room_state'){if(!joined){ws.send(JSON.stringify({type:'set_creator'}));joined=true;return}document.getElementById('editor-screen').style.display='none';document.getElementById('lobby-screen').style.display='block';document.getElementById('rcode').textContent=roomCode;document.getElementById('rcodebig').textContent=roomCode;var h='<h3>Players ('+msg.players_count+'/5):</h3>';h+='<p>Host: <b>'+(msg.host_name||'Host')+'</b></p>';for(var id in msg.players){var p=msg.players[id];if(!p.is_host)h+='<div style="padding:8px;background:#2a2a4a;border-radius:5px;margin:3px">'+p.name+'</div>'}if(!msg.players_count)h+='<p style="color:#aaa">Waiting...</p>';document.getElementById('lplayers').innerHTML=h;document.getElementById('btn-start-game').style.display='inline-block'}}}
+function launchGame(){ws.send(JSON.stringify({type:'start_game'}));document.getElementById('btn-start-game').textContent='Starting...';document.getElementById('btn-start-game').disabled=true}
+
+// ========== GAME RENDER ==========
+function renderGame(msg){
+  var game=msg.game,players=msg.players,round=game.rounds[game.current_round];
+  document.getElementById('rname').textContent=round.name+' ('+(game.current_round+1)+'/3)';
+  document.getElementById('hname-display').textContent=msg.host_name||'';
+  var ph='';for(var id in players){var p=players[id];if(p.is_host)continue;ph+='<div class="player-badge"><div class="pname">'+p.name+'</div><div class="pscore '+(p.score>=0?'plus':'minus')+'">'+p.score+'</div></div>'}
+  document.getElementById('gplayers').innerHTML=ph;
+  var bh='';for(var j=0;j<round.categories.length;j++)bh+='<div class="bcell head">'+round.categories[j]+'</div>';
+  for(var i=0;i<round.prices.length;i++){bh+='<div class="bcell head" style="background:#ff9800">'+round.prices[i]+'</div>';for(var j=0;j<round.categories.length;j++){var cat=round.categories[j],price=round.prices[i],key=cat+'_'+price,exists=round.questions[key],q=game.current_question,sel=q&&q.category===cat&&q.price===price;
+    bh+='<div class="bcell'+(exists?'':' used')+(sel?' selected':'')+'" onclick="'+(exists&&!sel?'selQ(\''+cat+'\','+price+')':'')+'">'+(exists?price:'')+'</div>'}}
+  document.getElementById('gboard').innerHTML=bh;
+  
+  var q=game.current_question;
+  if(q){
+    document.getElementById('ov-theme').textContent=q.category;
+    document.getElementById('ov-price').textContent=q.price;
+    document.getElementById('ov-text').textContent=q.question.text||'';
+    var mh='';if(q.question.qmedia)mh+='<img src="'+q.question.qmedia+'" style="max-width:400px;max-height:300px;border-radius:10px">';
+    if(q.question.amedia)mh+='<img src="'+q.question.amedia+'" style="max-width:400px;max-height:300px;border-radius:10px">';
+    document.getElementById('ov-media').innerHTML=mh;
     
-    playerId = Math.random().toString(36).substr(2, 8);
-    log('Connecting to ' + roomCode + ' as ' + name + '...');
+    // Кнопки в оверлее
+    var btns='';
+    if(q.status==='selected') btns='<button class="btn btn-green" onclick="openQ()" style="font-size:18px;padding:12px 30px">Open Question</button>';
+    else if(q.status==='open') btns='<button class="btn btn-orange" onclick="activateA()" style="font-size:18px;padding:12px 30px">Activate Answer</button>';
+    else if(q.status==='answering') btns='<button class="btn btn-green" onclick="evalA(true)" style="font-size:18px;padding:12px 30px">+ Correct</button> <button class="btn btn-red" onclick="evalA(false)" style="font-size:18px;padding:12px 30px">- Wrong</button>';
+    btns+=' <button class="btn btn-gray" onclick="skipQ()" style="font-size:18px;padding:12px 30px">Skip / No Answer</button>';
+    document.getElementById('ov-btns').innerHTML=btns;
     
-    ws = new WebSocket('ws://localhost:8000/ws/' + roomCode + '/' + playerId);
+    // Имя отвечающего
+    document.getElementById('ov-answerer').textContent=game.answering_name?'Answering: '+game.answering_name:'';
+    document.getElementById('ov-answerer').style.display=game.answering_name?'block':'none';
     
-    ws.onopen = function() {
-        log('Connected!');
-        ws.send(JSON.stringify({type:'join', name:name}));
-    };
-    
-    ws.onmessage = function(event) {
-        var msg = JSON.parse(event.data);
-        log('Received: ' + msg.type);
-        
-        if (msg.type === 'room_state') {
-            document.getElementById('login').style.display = 'none';
-            document.getElementById('game').style.display = 'block';
-            document.getElementById('roomCode').textContent = roomCode;
-            updatePlayers(msg.players);
-            if (!msg.creator) {
-                document.getElementById('controls').innerHTML = '<button class="blue" onclick="becomeHost()">Become Host</button>';
-            }
-        }
-        
-        if (msg.type === 'game_state') {
-            renderBoard(msg.game);
-        }
-    };
-    
-    ws.onerror = function(e) {
-        log('WebSocket error');
-    };
-    
-    ws.onclose = function() {
-        log('Disconnected');
-    };
+    document.getElementById('overlay').style.display='flex';
+  }else{
+    document.getElementById('overlay').style.display='none';
+  }
+  
+  // Нижняя панель — только кнопка Next Round
+  document.getElementById('btn-next').style.display=!q&&!Object.keys(round.questions).length&&game.phase==='playing'?'inline-block':'none';
+  document.getElementById('ansname').textContent='';
 }
-
-function becomeHost() {
-    ws.send(JSON.stringify({type:'set_creator'}));
-    isHost = true;
-    log('You are host now');
-    document.getElementById('controls').innerHTML = '<button class="green" onclick="startGame()">Start Game</button>';
-}
-
-function startGame() {
-    ws.send(JSON.stringify({type:'start_game'}));
-    log('Game starting...');
-}
-
-function updatePlayers(players) {
-    var html = '';
-    for (var id in players) {
-        var p = players[id];
-        html += '<div class="player">' + p.name + ': ' + p.score + '</div>';
-    }
-    document.getElementById('players').innerHTML = html;
-}
-
-function renderBoard(game) {
-    var round = game.rounds[game.current_round];
-    var html = '';
-    for (var i = 0; i < round.prices.length; i++) {
-        for (var j = 0; j < round.categories.length; j++) {
-            var cat = round.categories[j];
-            var price = round.prices[i];
-            var key = cat + '_' + price;
-            var exists = round.questions[key];
-            html += '<div class="cell' + (exists ? '' : ' used') + '" onclick="' + (exists ? 'selectQuestion(\'' + cat + '\',' + price + ')' : '') + '">' + (exists ? price : '') + '</div>';
-        }
-    }
-    document.getElementById('board').innerHTML = html;
-}
-
-function selectQuestion(cat, price) {
-    ws.send(JSON.stringify({type:'select_question', category:cat, price:price}));
-    log('Selected: ' + cat + ' - ' + price);
-}
+function selQ(cat,price){ws.send(JSON.stringify({type:'select_question',category:cat,price:price}))}
+function openQ(){ws.send(JSON.stringify({type:'open_question'}))}
+function activateA(){ws.send(JSON.stringify({type:'open_question'}))}
+function evalA(correct){ws.send(JSON.stringify({type:'evaluate_answer',correct:correct}))}
+function skipQ(){ws.send(JSON.stringify({type:'skip_question'}))}
+function nextR(){ws.send(JSON.stringify({type:'next_round'}))}
 </script>
 </body>
 </html>

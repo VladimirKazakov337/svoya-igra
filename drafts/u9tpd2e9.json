@@ -1,0 +1,572 @@
+{
+  "rounds": [
+    {
+      "name": "Раунд 1",
+      "categories": [
+        {
+          "name": "Тема 1",
+          "questions": [
+            {
+              "price": 100,
+              "text": "qe",
+              "answer": "rqv",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 200,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 300,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 500,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            }
+          ]
+        },
+        {
+          "name": "Тема 2",
+          "questions": [
+            {
+              "price": 100,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 200,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 300,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 500,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            }
+          ]
+        },
+        {
+          "name": "Тема 3",
+          "questions": [
+            {
+              "price": 100,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 200,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 300,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 500,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            }
+          ]
+        },
+        {
+          "name": "Тема 4",
+          "questions": [
+            {
+              "price": 100,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 200,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 300,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 500,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            }
+          ]
+        },
+        {
+          "name": "Тема 5",
+          "questions": [
+            {
+              "price": 100,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 200,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 300,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            },
+            {
+              "price": 500,
+              "text": "",
+              "answer": "",
+              "question_media": {},
+              "answer_media": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Раунд 2",
+      "categories": [
+        {
+          "name": "Тема 1",
+          "questions": [
+            {
+              "price": 200,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 800,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1000,
+              "text": "",
+              "answer": ""
+            }
+          ]
+        },
+        {
+          "name": "Тема 2",
+          "questions": [
+            {
+              "price": 200,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 800,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1000,
+              "text": "",
+              "answer": ""
+            }
+          ]
+        },
+        {
+          "name": "Тема 3",
+          "questions": [
+            {
+              "price": 200,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 800,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1000,
+              "text": "",
+              "answer": ""
+            }
+          ]
+        },
+        {
+          "name": "Тема 4",
+          "questions": [
+            {
+              "price": 200,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 800,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1000,
+              "text": "",
+              "answer": ""
+            }
+          ]
+        },
+        {
+          "name": "Тема 5",
+          "questions": [
+            {
+              "price": 200,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 400,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 800,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1000,
+              "text": "",
+              "answer": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Раунд 3",
+      "categories": [
+        {
+          "name": "Тема 1",
+          "questions": [
+            {
+              "price": 300,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 900,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1200,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1500,
+              "text": "",
+              "answer": ""
+            }
+          ]
+        },
+        {
+          "name": "Тема 2",
+          "questions": [
+            {
+              "price": 300,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 900,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1200,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1500,
+              "text": "",
+              "answer": ""
+            }
+          ]
+        },
+        {
+          "name": "Тема 3",
+          "questions": [
+            {
+              "price": 300,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 900,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1200,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1500,
+              "text": "",
+              "answer": ""
+            }
+          ]
+        },
+        {
+          "name": "Тема 4",
+          "questions": [
+            {
+              "price": 300,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 900,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1200,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1500,
+              "text": "",
+              "answer": ""
+            }
+          ]
+        },
+        {
+          "name": "Тема 5",
+          "questions": [
+            {
+              "price": 300,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 600,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 900,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1200,
+              "text": "",
+              "answer": ""
+            },
+            {
+              "price": 1500,
+              "text": "",
+              "answer": ""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "final": [
+    {
+      "name": "Тема 1",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "name": "Тема 2",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "name": "Тема 3",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "name": "Тема 4",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "name": "Тема 5",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "name": "Тема 6",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "name": "Тема 7",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "name": "Тема 8",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "name": "Тема 9",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "name": "Тема 10",
+      "text": "",
+      "answer": ""
+    }
+  ],
+  "name": "Плюс вайб"
+}
