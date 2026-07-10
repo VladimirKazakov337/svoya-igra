@@ -94,6 +94,20 @@ class GameManager:
         print(f"Room created: {room_code}")
         return room_code
 
+    async def _skip_question(self, room_code, player_id, message):
+        game = self.games.get(room_code)
+        if not game or not game["current_question"]:
+            return
+        price = game["current_question"]["price"]
+        key = f"{game['current_question']['category']}_{price}"
+        current = game["rounds"][game["current_round"]]
+        if key in current["questions"]:
+            del current["questions"][key]
+        game["current_question"] = None
+        game["answered_players"] = []
+        await self._check_round_complete(room_code)
+        await self.broadcast_game_state(room_code)
+
     async def connect(self, room_code: str, player_id: str, websocket: WebSocket):
         if room_code not in self.rooms:
             await websocket.close(code=4004, reason="Room not found")
@@ -141,6 +155,8 @@ class GameManager:
             await self._handle_select_question(room_code, player_id, message)
         elif msg_type == "open_question":
             await self._handle_open_question(room_code, player_id, message)
+        elif msg_type == "skip_question":
+            await self._skip_question(room_code, player_id, message)
         elif msg_type == "answer_attempt":
             await self._handle_answer_attempt(room_code, player_id, message)
         elif msg_type == "evaluate_answer":

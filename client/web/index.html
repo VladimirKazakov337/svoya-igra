@@ -56,6 +56,7 @@ body{font-family:Arial;background:#1a1a2e;color:white;min-height:100vh}
 .overlay-box .q-text{font-size:26px;margin:20px 0;line-height:1.4}
 .overlay-box img{max-width:400px;max-height:300px;border-radius:10px;margin:10px 0}
 .overlay-box audio{width:100%;margin:10px 0}
+.overlay-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:15px}
 </style>
 </head>
 <body>
@@ -149,30 +150,24 @@ function renderGame(msg){
   var ph='';for(var id in players){var p=players[id];if(p.is_host)continue;ph+='<div class="player-badge"><div class="pname">'+p.name+'</div><div class="pscore '+(p.score>=0?'plus':'minus')+'">'+p.score+'</div></div>'}
   document.getElementById('gplayers').innerHTML=ph;
   var bh='';for(var j=0;j<round.categories.length;j++)bh+='<div class="bcell head">'+round.categories[j]+'</div>';
-  for(var i=0;i<round.prices.length;i++){bh+='<div class="bcell head" style="background:#ff9800">'+round.prices[i]+'</div>';for(var j=0;j<round.categories.length;j++){var cat=round.categories[j],price=round.prices[i],key=cat+'_'+price,exists=round.questions[key],q=game.current_question,sel=q&&q.category===cat&&q.price===price;
+  for(var i=0;i<round.prices.length;i++){for(var j=0;j<round.categories.length;j++){var cat=round.categories[j],price=round.prices[i],key=cat+'_'+price,exists=round.questions[key],q=game.current_question,sel=q&&q.category===cat&&q.price===price;
     bh+='<div class="bcell'+(exists?'':' used')+(sel?' selected':'')+'" onclick="'+(exists&&!sel?'selQ(\''+cat+'\','+price+')':'')+'">'+(exists?price:'')+'</div>'}}
   document.getElementById('gboard').innerHTML=bh;
   
   var q=game.current_question;
   if(q){
-    document.getElementById('ov-theme').textContent=q.category;
-    document.getElementById('ov-price').textContent=q.price;
+    document.getElementById('ov-theme').style.display='none';
+    document.getElementById('ov-price').style.display='none';
     document.getElementById('ov-text').textContent=q.question.text||'';
     var mh='';if(q.question.qmedia)mh+='<img src="'+q.question.qmedia+'" style="max-width:400px;max-height:300px;border-radius:10px">';
-    if(q.question.amedia)mh+='<img src="'+q.question.amedia+'" style="max-width:400px;max-height:300px;border-radius:10px">';
     document.getElementById('ov-media').innerHTML=mh;
+    document.getElementById('ov-answerer').style.display='none';
     
-    // Кнопки в оверлее
-    var btns='';
-    if(q.status==='selected') btns='<button class="btn btn-green" onclick="openQ()" style="font-size:18px;padding:12px 30px">Open Question</button>';
-    else if(q.status==='open') btns='<button class="btn btn-orange" onclick="activateA()" style="font-size:18px;padding:12px 30px">Activate Answer</button>';
-    else if(q.status==='answering') btns='<button class="btn btn-green" onclick="evalA(true)" style="font-size:18px;padding:12px 30px">+ Correct</button> <button class="btn btn-red" onclick="evalA(false)" style="font-size:18px;padding:12px 30px">- Wrong</button>';
-    btns+=' <button class="btn btn-gray" onclick="skipQ()" style="font-size:18px;padding:12px 30px">Skip / No Answer</button>';
-    document.getElementById('ov-btns').innerHTML=btns;
+    var btns='<button class="btn btn-orange" onclick="showAnswerInOverlay()" style="font-size:18px;padding:12px 30px">SHOW ANSWER</button> ';
+    btns+=' <button class="btn btn-red" onclick="skipQ()" style="font-size:18px;padding:12px 30px">FINISH</button>';
+    document.getElementById('ov-btns').innerHTML='<div class="overlay-btns">'+btns+'</div>';
     
-    // Имя отвечающего
-    document.getElementById('ov-answerer').textContent=game.answering_name?'Answering: '+game.answering_name:'';
-    document.getElementById('ov-answerer').style.display=game.answering_name?'block':'none';
+    window._currentAnswer = q.question.answer||'';
     
     document.getElementById('overlay').style.display='flex';
   }else{
@@ -187,6 +182,10 @@ function selQ(cat,price){ws.send(JSON.stringify({type:'select_question',category
 function openQ(){ws.send(JSON.stringify({type:'open_question'}))}
 function activateA(){ws.send(JSON.stringify({type:'open_question'}))}
 function evalA(correct){ws.send(JSON.stringify({type:'evaluate_answer',correct:correct}))}
+function showAnswerInOverlay(){
+  document.getElementById('ov-text').innerHTML += '<br><br><span style="color:#ff9800;font-size:24px;font-weight:bold">ANSWER: '+window._currentAnswer+'</span>';
+  document.getElementById('ov-btns').innerHTML = '<div class="overlay-btns"><button class="btn btn-red" onclick="skipQ()" style="font-size:18px;padding:12px 30px">FINISH</button></div>';
+}
 function skipQ(){ws.send(JSON.stringify({type:'skip_question'}))}
 function nextR(){ws.send(JSON.stringify({type:'next_round'}))}
 </script>
