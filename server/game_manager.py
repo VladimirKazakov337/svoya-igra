@@ -155,6 +155,8 @@ class GameManager:
             await self._handle_select_question(room_code, player_id, message)
         elif msg_type == "open_question":
             await self._handle_open_question(room_code, player_id, message)
+        elif msg_type == "next_round":
+            await self._next_round(room_code, player_id, message)
         elif msg_type == "skip_question":
             await self._skip_question(room_code, player_id, message)
         elif msg_type == "answer_attempt":
@@ -285,6 +287,18 @@ class GameManager:
                     if pid != answering:
                         room["players"][pid]["can_answer"] = True
             await self.broadcast_game_state(room_code)
+
+    async def _next_round(self, room_code, player_id, message):
+        game = self.games.get(room_code)
+        room = self.rooms[room_code]
+        if not game or player_id != room["host"]:
+            return
+        if game["current_round"] < 2:
+            game["current_round"] += 1
+            game["current_question"] = None
+        elif game["phase"] != "final":
+            game["phase"] = "final"
+        await self.broadcast_game_state(room_code)
 
     async def _check_round_complete(self, room_code: str):
         game = self.games.get(room_code)

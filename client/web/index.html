@@ -143,7 +143,16 @@ function launchGame(){ws.send(JSON.stringify({type:'start_game'}));document.getE
 
 // ========== GAME RENDER ==========
 function renderGame(msg){
-  var game=msg.game,players=msg.players,round=game.rounds[game.current_round];
+  var game=msg.game,players=msg.players;
+  if(game.phase==='final'){
+    document.getElementById('rname').textContent='FINAL ROUND';
+    document.getElementById('gplayers').innerHTML='';
+    document.getElementById('gboard').innerHTML='<div style="text-align:center;padding:50px"><h2>Final Round</h2><p>10 themes ready</p></div>';
+    document.getElementById('btn-next').style.display='none';
+    document.getElementById('overlay').style.display='none';
+    return;
+  }
+  var round=game.rounds[game.current_round];
   document.getElementById('rname').textContent=round.name+' ('+(game.current_round+1)+'/3)';
   document.getElementById('hname-display').textContent=msg.host_name||'';
   var ph='';for(var id in players){var p=players[id];if(p.is_host)continue;ph+='<div class="player-badge"><div class="pname">'+p.name+'</div><div class="pscore '+(p.score>=0?'plus':'minus')+'">'+p.score+'</div></div>'}
