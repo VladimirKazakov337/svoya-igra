@@ -56,7 +56,6 @@ body{font-family:Arial;background:#1a1a2e;color:white;min-height:100vh}
 .overlay-box .q-text{font-size:26px;margin:20px 0;line-height:1.4}
 .overlay-box img{max-width:400px;max-height:300px;border-radius:10px;margin:10px 0}
 .overlay-box audio{width:100%;margin:10px 0}
-.overlay-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:15px}
 </style>
 </head>
 <body>
@@ -106,7 +105,7 @@ body{font-family:Arial;background:#1a1a2e;color:white;min-height:100vh}
 <div class="overlay-box">
 <h2 id="ov-theme" style="display:none"></h2><div class="big-price" id="ov-price" style="display:none"></div>
 <div class="q-text" id="ov-text"></div><div id="ov-media"></div>
-<div id="ov-answerer" style="font-size:28px;font-weight:bold;color:#ff9800;margin:15px 0;display:none"></div><div id="ov-btns"></div><button class="btn btn-gray" onclick="document.getElementById('overlay').style.display='none'" style="margin-top:15px">Close</button>
+<div id="ov-answerer" style="font-size:28px;font-weight:bold;color:#ff9800;margin:15px 0;display:none"></div><div id="ov-btns" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"></div><button class="btn btn-gray" onclick="document.getElementById('overlay').style.display='none'" style="margin-top:15px">Close</button>
 </div>
 </div>
 
@@ -130,8 +129,8 @@ function dropRound(e,r,c,q,type,zone){e.preventDefault();zone.classList.remove('
 function dropFinal(e,i,type,zone){e.preventDefault();zone.classList.remove('dragover');var f=e.dataTransfer.files[0];if(!f)return;var inp=zone.nextElementSibling;var dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;upFinal(i,type,inp)}
 var activeDZ=null;document.addEventListener('mouseover',function(e){if(e.target.classList.contains('drop-zone'))activeDZ=e.target});document.addEventListener('paste',function(e){if(!activeDZ)return;var items=e.clipboardData.items;if(!items)return;for(var i=0;i<items.length;i++){if(items[i].type.indexOf('image')>=0||items[i].type.indexOf('audio')>=0){var f=items[i].getAsFile();var inp=activeDZ.nextElementSibling;if(inp&&inp.type==='file'){var dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;inp.dispatchEvent(new Event('change'));activeDZ.textContent='File loaded';activeDZ.classList.add('has-file')}e.preventDefault();break}}});
 
-async function upRound(r,c,q,type,input){var file=input.files[0];if(!file)return;var fd=new FormData();fd.append('file',file);var resp=await fetch('/api/upload',{method:'POST',body:fd});var d=await resp.json();if(type==='q')T.rounds[r].categories[c].questions[q].qmedia=d.url;else T.rounds[r].categories[c].questions[q].amedia=d.url;renderRound(r)}
-async function upFinal(i,type,input){var file=input.files[0];if(!file)return;var fd=new FormData();fd.append('file',file);var resp=await fetch('/api/upload',{method:'POST',body:fd});var d=await resp.json();if(type==='q')T.final[i].qmedia=d.url;else T.final[i].amedia=d.url;renderRound(3)}
+async function upRound(r,c,q,type,input){var file=input.files[0];if(!file)return;var fd=new FormData();fd.append('file',file);var resp=await fetch('/api/upload',{method:'POST',body:fd});var d=await resp.json();if(type==='q'){T.rounds[r].categories[c].questions[q].qmedia=d.url;T.rounds[r].categories[c].questions[q].qmediatype=f.type.startsWith('audio/')?'audio':'image'}else{T.rounds[r].categories[c].questions[q].amedia=d.url;T.rounds[r].categories[c].questions[q].amediatype=f.type.startsWith('audio/')?'audio':'image'}renderRound(r)}
+async function upFinal(i,type,input){var file=input.files[0];if(!file)return;var fd=new FormData();fd.append('file',file);var resp=await fetch('/api/upload',{method:'POST',body:fd});var d=await resp.json();if(type==='q'){T.final[i].qmedia=d.url;T.final[i].qmediatype=f.type.startsWith('audio/')?'audio':'image'}else{T.final[i].amedia=d.url;T.final[i].amediatype=f.type.startsWith('audio/')?'audio':'image'}renderRound(3)}
 
 async function loadDrafts(){var r=await fetch('/api/drafts');var d=await r.json();var h='';if(!d.drafts||!d.drafts.length)h='<p>No drafts</p>';else for(var x of d.drafts)h+='<div style="padding:8px;cursor:pointer;background:#2a2a4a;margin:3px;border-radius:5px" onclick="openDraft(\''+x.id+'\')">'+x.name+'</div>';document.getElementById('drafts-list').innerHTML=h}
 async function openDraft(id){var r=await fetch('/api/draft/load',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})});var d=await r.json();if(d.template){T=d.template;showEditor();document.getElementById('gameName').value=T.name||'';switchRound(0)}}
@@ -159,15 +158,15 @@ function renderGame(msg){
     document.getElementById('ov-theme').style.display='none';
     document.getElementById('ov-price').style.display='none';
     document.getElementById('ov-text').textContent=q.question.text||'';
-    var mh='';if(q.question.qmedia)mh+='<img src="'+q.question.qmedia+'" style="max-width:400px;max-height:300px;border-radius:10px">';
+    console.log('Q media:', q.question.qmedia, 'type:', q.question.qmediatype); var mh='';if(q.question.qmedia){if(q.question.qmediatype==='audio')mh+='<audio controls src="'+q.question.qmedia+'" style="width:100%;max-width:400px"></audio>';else mh+='<img src="'+q.question.qmedia+'" style="max-width:400px;max-height:300px;border-radius:10px">';}
     document.getElementById('ov-media').innerHTML=mh;
     document.getElementById('ov-answerer').style.display='none';
     
     var btns='<button class="btn btn-orange" onclick="showAnswerInOverlay()" style="font-size:18px;padding:12px 30px">SHOW ANSWER</button> ';
     btns+=' <button class="btn btn-red" onclick="skipQ()" style="font-size:18px;padding:12px 30px">FINISH</button>';
-    document.getElementById('ov-btns').innerHTML='<div class="overlay-btns">'+btns+'</div>';
+    document.getElementById('ov-btns').innerHTML=btns;
     
-    window._currentAnswer = q.question.answer||'';
+    window._currentAnswer = q.question.answer||''; window._currentAnswerMedia = q.question.amedia?{url:q.question.amedia, type:q.question.amediatype||'image'}:null; window._currentAnswerMediatype = q.question.amediatype||'';
     
     document.getElementById('overlay').style.display='flex';
   }else{
@@ -183,8 +182,14 @@ function openQ(){ws.send(JSON.stringify({type:'open_question'}))}
 function activateA(){ws.send(JSON.stringify({type:'open_question'}))}
 function evalA(correct){ws.send(JSON.stringify({type:'evaluate_answer',correct:correct}))}
 function showAnswerInOverlay(){
-  document.getElementById('ov-text').innerHTML += '<br><br><span style="color:#ff9800;font-size:24px;font-weight:bold">ANSWER: '+window._currentAnswer+'</span>';
-  document.getElementById('ov-btns').innerHTML = '<div class="overlay-btns"><button class="btn btn-red" onclick="skipQ()" style="font-size:18px;padding:12px 30px">FINISH</button></div>';
+  var ansHtml = '<span style="color:#ff9800;font-size:28px;font-weight:bold">'+window._currentAnswer+'</span>';
+  if(window._currentAnswerMedia){
+    if(window._currentAnswerMediatype==='audio') ansHtml += '<br><audio controls src="'+window._currentAnswerMedia.url+'" style="width:100%;max-width:400px;margin-top:15px"></audio>';
+    else ansHtml += '<br><img src="'+window._currentAnswerMedia.url+'" style="max-width:400px;max-height:300px;border-radius:10px;margin-top:15px">';
+  }
+  document.getElementById('ov-text').innerHTML = ansHtml;
+  document.getElementById('ov-media').innerHTML = '';
+  document.getElementById('ov-btns').innerHTML = '<button class="btn btn-red" onclick="skipQ()" style="font-size:18px;padding:12px 30px">FINISH</button>';
 }
 function skipQ(){ws.send(JSON.stringify({type:'skip_question'}))}
 function nextR(){ws.send(JSON.stringify({type:'next_round'}))}

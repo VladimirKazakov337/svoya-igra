@@ -208,6 +208,10 @@ class GameManager:
                             "answer": q.get("answer", ""),
                             "price": q["price"],
                             "category": cat["name"],
+                            "qmedia": q.get("qmedia", ""),
+                            "qmediatype": q.get("qmediatype", ""),
+                            "amedia": q.get("amedia", ""),
+                            "amediatype": q.get("amediatype", ""),
                             "question_media": q.get("question_media", {}),
                             "answer_media": q.get("answer_media", {})
                         }
