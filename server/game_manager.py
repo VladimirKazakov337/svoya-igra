@@ -226,7 +226,11 @@ class GameManager:
 
     async def _handle_select_question(self, room_code, player_id, message):
         game = self.games.get(room_code)
-        if not game or game.get("current_selector") != player_id:
+        room = self.rooms[room_code]
+        if not game:
+            return
+        # Host can always select
+        if player_id != room.get("host"):
             return
         cat = message.get("category")
         price = message.get("price")
@@ -257,6 +261,7 @@ class GameManager:
         if not game["answered_players"]:
             game["answered_players"].append(player_id)
             game["current_question"]["status"] = "answering"
+            game["answering_name"] = room["players"][player_id]["name"]
             for pid in room["players"]:
                 if pid != player_id:
                     room["players"][pid]["can_answer"] = False
@@ -280,11 +285,13 @@ class GameManager:
                     del game["rounds"][game["current_round"]]["questions"][key]
                 game["current_question"] = None
                 game["answered_players"] = []
+                game["answering_name"] = ""
                 await self._check_round_complete(room_code)
             else:
                 room["players"][answering]["score"] -= price
                 game["current_question"]["status"] = "open"
                 game["answered_players"] = []
+                game["answering_name"] = ""
                 for pid in room["players"]:
                     if pid != answering:
                         room["players"][pid]["can_answer"] = True
@@ -357,7 +364,7 @@ class GameManager:
         print(f"Broadcasting game_state to {len(room['players'])} players: {list(room['players'].keys())}, selector={sel_name}")
         for pid, player in room["players"].items():
             try:
-                state = {"type": "game_state", "game": game, "players": players_info, "current_player": pid, "current_selector": sel_id, "selector_name": sel_name, "host_name": room.get("host_name", "")}
+                state = {"type": "game_state", "game": game, "players": players_info, "current_player": pid, "current_selector": sel_id, "selector_name": sel_name, "host_name": room.get("host_name", ""), "answering_name": game.get("answering_name", "")}
                 await player["websocket"].send_json(state)
                 print(f"Sent game_state to {pid}")
             except Exception as e:

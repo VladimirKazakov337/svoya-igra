@@ -110,13 +110,14 @@ body{font-family:Arial;background:#1a1a2e;color:white;min-height:100vh}
 </div>
 
 <script>
-var T,prices=[[100,200,300,400,500],[200,400,600,800,1000],[300,600,900,1200,1500]],currentRound=0,ws,roomCode,playerId,joined=false;
+var T,prices=[[100,200,300,400,500],[200,400,600,800,1000],[300,600,900,1200,1500]],currentRound=0,roomCode,playerId,joined=false;
 
 function showEditor(){document.getElementById('start-screen').style.display='none';document.getElementById('editor-screen').style.display='block'}
 function backToStart(){document.getElementById('editor-screen').style.display='none';document.getElementById('start-screen').style.display='block'}
 
+window.ws=null;
 function initTemplate(){T={rounds:[],final:[],name:'My Game'};for(var r=0;r<3;r++){var cats=[];for(var c=0;c<5;c++){var qs=[];for(var q=0;q<5;q++)qs.push({price:prices[r][q],text:'',answer:'',qmedia:'',amedia:''});cats.push({name:'Theme '+(c+1),questions:qs})}T.rounds.push({name:'Round '+(r+1),categories:cats})}for(var i=0;i<10;i++)T.final.push({name:'Theme '+(i+1),text:'',answer:'',qmedia:'',amedia:''})}
-initTemplate();switchRound(0);
+initTemplate();document.addEventListener("click",function(e){var c=e.target.closest(".bcell");if(!c)return;var cat=c.getAttribute("data-cat");var price=c.getAttribute("data-price");var ex=c.getAttribute("data-exists");var sel=c.getAttribute("data-sel");if(cat&&price&&ex==="1"&&sel==="0"){window.ws.send(JSON.stringify({type:"select_question",category:cat,price:parseInt(price)}))}});switchRound(0);
 
 function switchRound(idx){currentRound=idx;var btns=document.querySelectorAll('#tabs button');btns.forEach(function(b,i){b.classList.remove('active');if(i===idx)b.classList.add('active')});renderRound(idx)}
 
@@ -136,12 +137,14 @@ async function loadDrafts(){var r=await fetch('/api/drafts');var d=await r.json(
 async function openDraft(id){var r=await fetch('/api/draft/load',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})});var d=await r.json();if(d.template){T=d.template;showEditor();document.getElementById('gameName').value=T.name||'';switchRound(0)}}
 async function saveDraft(){T.name=document.getElementById('gameName').value||'My Game';var did=Math.random().toString(36).substr(2,8);await fetch('/api/draft/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:did,template:T})});alert('Draft saved!')}
 
-async function startGame(){T.name=document.getElementById('gameName').value||'My Game';var r=await fetch('/api/create_room',{method:'POST'});var d=await r.json();roomCode=d.room_code;await fetch('/api/save_template/'+roomCode,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(T)});playerId=Math.random().toString(36).substr(2,8);ws=new WebSocket('ws://'+window.location.hostname+':8000/ws/'+roomCode+'/'+playerId);ws.onopen=function(){ws.send(JSON.stringify({type:'join',name:document.getElementById('hostName').value||'Host'}))};joined=false;ws.onmessage=function(ev){var msg=JSON.parse(ev.data);
+async function startGame(){T.name=document.getElementById('gameName').value||'My Game';var r=await fetch('/api/create_room',{method:'POST'});var d=await r.json();roomCode=d.room_code;await fetch('/api/save_template/'+roomCode,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(T)});playerId=Math.random().toString(36).substr(2,8);window.ws=new WebSocket('ws://'+window.location.hostname+':8000/ws/'+roomCode+'/'+playerId);window.ws.onopen=function(){window.ws.send(JSON.stringify({type:'join',name:document.getElementById('hostName').value||'Host'}))};joined=false;window.ws.onmessage=function(ev){var msg=JSON.parse(ev.data);
   if(msg.type==='game_state'){document.getElementById('lobby-screen').style.display='none';document.getElementById('game-screen').style.display='flex';renderGame(msg);return}
-  if(msg.type==='room_state'){if(!joined){ws.send(JSON.stringify({type:'set_creator'}));joined=true;return}document.getElementById('editor-screen').style.display='none';document.getElementById('lobby-screen').style.display='block';document.getElementById('rcode').textContent=roomCode;document.getElementById('rcodebig').textContent=roomCode;var h='<h3>Players ('+msg.players_count+'/5):</h3>';h+='<p>Host: <b>'+(msg.host_name||'Host')+'</b></p>';for(var id in msg.players){var p=msg.players[id];if(!p.is_host)h+='<div style="padding:8px;background:#2a2a4a;border-radius:5px;margin:3px">'+p.name+'</div>'}if(!msg.players_count)h+='<p style="color:#aaa">Waiting...</p>';document.getElementById('lplayers').innerHTML=h;document.getElementById('btn-start-game').style.display='inline-block'}}}
-function launchGame(){ws.send(JSON.stringify({type:'start_game'}));document.getElementById('btn-start-game').textContent='Starting...';document.getElementById('btn-start-game').disabled=true}
+  if(msg.type==='room_state'){if(!joined){window.ws.send(JSON.stringify({type:"set_creator"}));joined=true;return}document.getElementById('editor-screen').style.display='none';document.getElementById('lobby-screen').style.display='block';document.getElementById('rcode').textContent=roomCode;document.getElementById('rcodebig').textContent=roomCode;var h='<h3>Players ('+msg.players_count+'/5):</h3>';h+='<p>Host: <b>'+(msg.host_name||'Host')+'</b></p>';for(var id in msg.players){var p=msg.players[id];if(!p.is_host)h+='<div style="padding:8px;background:#2a2a4a;border-radius:5px;margin:3px">'+p.name+'</div>'}if(!msg.players_count)h+='<p style="color:#aaa">Waiting...</p>';document.getElementById('lplayers').innerHTML=h;document.getElementById('btn-start-game').style.display='inline-block'}}}
+function launchGame(){window.ws.send(JSON.stringify({type:"start_game"}));document.getElementById('btn-start-game').textContent='Starting...';document.getElementById('btn-start-game').disabled=true}
 
 // ========== GAME RENDER ==========
+var _lastBoardHTML='';
+if(typeof _lastBoardHTML==='undefined'){window._lastBoardHTML='';}
 function renderGame(msg){ window._gameState = msg; 
   var game=msg.game,players=msg.players;
   if(game.phase==='final'){
@@ -160,7 +163,7 @@ function renderGame(msg){ window._gameState = msg;
         bh+='<div class="bcell" style="'+(last?'background:#28a745':'background:#ff9800')+'" onclick="'+(last?'showFinalQuestion('+th.index+')':'eliminateTheme('+th.index+')')+'">'+th.name+'</div>';
       }
     }
-    document.getElementById('gboard').innerHTML=bh;
+    if(bh!==window._lastBoardHTML){document.getElementById('gboard').innerHTML=bh;window._lastBoardHTML=bh;}
     document.getElementById('btn-next').style.display='none';
     document.getElementById('overlay').style.display='none';
     return;
@@ -172,8 +175,8 @@ function renderGame(msg){ window._gameState = msg;
   document.getElementById('gplayers').innerHTML=ph;
   var bh='';for(var j=0;j<round.categories.length;j++)bh+='<div class="bcell head">'+round.categories[j]+'</div>';
   for(var i=0;i<round.prices.length;i++){for(var j=0;j<round.categories.length;j++){var cat=round.categories[j],price=round.prices[i],key=cat+'_'+price,exists=round.questions[key],q=game.current_question,sel=q&&q.category===cat&&q.price===price;
-    bh+='<div class="bcell'+(exists?'':' used')+(sel?' selected':'')+'" onclick="'+(exists&&!sel?'selQ(\''+cat+'\','+price+')':'')+'">'+(exists?price:'')+'</div>'}}
-  document.getElementById('gboard').innerHTML=bh;
+    bh+='<div class="bcell'+(exists?'':' used')+(sel?' selected':'')+'" data-cat="'+cat+'" data-price="'+price+'" data-exists="'+(exists?1:0)+'" data-sel="'+(sel?1:0)+'">'+(exists?price:'')+'</div>'}}
+  if(bh!==window._lastBoardHTML){document.getElementById('gboard').innerHTML=bh;window._lastBoardHTML=bh;}
   
   var q=game.current_question;
   if(q){
@@ -182,10 +185,13 @@ function renderGame(msg){ window._gameState = msg;
     document.getElementById('ov-text').textContent=q.question.text||'';
     console.log('Q media:', q.question.qmedia, 'type:', q.question.qmediatype); var mh='';if(q.question.qmedia){if(q.question.qmediatype==='audio')mh+='<audio controls src="'+q.question.qmedia+'" style="width:100%;max-width:400px"></audio>';else mh+='<img src="'+q.question.qmedia+'" style="max-width:400px;max-height:300px;border-radius:10px">';}
     document.getElementById('ov-media').innerHTML=mh;
-    document.getElementById('ov-answerer').style.display='none';
+    document.getElementById('ov-answerer').textContent=game.answering_name&&game.answering_name!==''?'ANSWERING: '+game.answering_name:''; document.getElementById('ov-answerer').style.display=game.answering_name&&game.answering_name!==''?'block':'none';
     
-    var btns='<button class="btn btn-orange" onclick="showAnswerInOverlay()" style="font-size:18px;padding:12px 30px">SHOW ANSWER</button> ';
-    btns+=' <button class="btn btn-red" onclick="skipQ()" style="font-size:18px;padding:12px 30px">FINISH</button>';
+    var btns='';
+    if(q.status==='selected'||q.status==='open') btns+='<button class="btn btn-orange" onclick="activateA()" style="font-size:18px;padding:12px 30px;margin:5px">ACTIVATE ANSWER</button> ';
+    if(q.status==='answering'){ btns+='<button class="btn btn-green" onclick="evalA(true)" style="font-size:18px;padding:12px 30px;margin:5px">+ CORRECT</button> '; btns+='<button class="btn btn-red" onclick="evalA(false)" style="font-size:18px;padding:12px 30px;margin:5px">- WRONG</button> '; }
+    btns+='<button class="btn btn-orange" onclick="showAnswerInOverlay()" style="font-size:18px;padding:12px 30px;margin:5px">SHOW ANSWER</button> ';
+    btns+='<button class="btn btn-gray" onclick="skipQ()" style="font-size:18px;padding:12px 30px;margin:5px">FINISH</button>';
     document.getElementById('ov-btns').innerHTML=btns;
     
     window._currentAnswer = q.question.answer||''; window._currentAnswerMedia = q.question.amedia?{url:q.question.amedia, type:q.question.amediatype||'image'}:null; window._currentAnswerMediatype = q.question.amediatype||'';
@@ -200,7 +206,7 @@ function renderGame(msg){ window._gameState = msg;
   document.getElementById('ansname').textContent='';
 }
 function selQ(cat,price){ws.send(JSON.stringify({type:'select_question',category:cat,price:price}))}
-function openQ(){ws.send(JSON.stringify({type:'open_question'}))}
+function activateA(){window.ws.send(JSON.stringify({type:"open_question"}))} function evalA(correct){window.ws.send(JSON.stringify({type:"evaluate_answer",correct:correct}))} function openQ(){ws.send(JSON.stringify({type:'open_question'}))}
 function activateA(){ws.send(JSON.stringify({type:'open_question'}))}
 function evalA(correct){ws.send(JSON.stringify({type:'evaluate_answer',correct:correct}))}
 function showAnswerInOverlay(){
