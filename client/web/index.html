@@ -190,6 +190,7 @@ function renderGame(msg){ window._gameState = msg;
     var btns='';
     if(q.status==='selected'||q.status==='open') btns+='<button class="btn btn-orange" onclick="activateA()" style="font-size:18px;padding:12px 30px;margin:5px">ACTIVATE ANSWER</button> ';
     if(q.status==='answering'){ btns+='<button class="btn btn-green" onclick="evalA(true)" style="font-size:18px;padding:12px 30px;margin:5px">+ CORRECT</button> '; btns+='<button class="btn btn-red" onclick="evalA(false)" style="font-size:18px;padding:12px 30px;margin:5px">- WRONG</button> '; }
+    if(q.status==='answered'){ btns+='<button class="btn btn-gray" onclick="skipQ()" style="font-size:18px;padding:12px 30px;margin:5px">FINISH</button> '; showAnswerInOverlay(); }
     btns+='<button class="btn btn-orange" onclick="showAnswerInOverlay()" style="font-size:18px;padding:12px 30px;margin:5px">SHOW ANSWER</button> ';
     btns+='<button class="btn btn-gray" onclick="skipQ()" style="font-size:18px;padding:12px 30px;margin:5px">FINISH</button>';
     document.getElementById('ov-btns').innerHTML=btns;

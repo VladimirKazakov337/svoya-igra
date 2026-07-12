@@ -98,6 +98,7 @@ class GameManager:
         game = self.games.get(room_code)
         if not game or not game["current_question"]:
             return
+        # Удаляем вопрос из доски
         price = game["current_question"]["price"]
         key = f"{game['current_question']['category']}_{price}"
         current = game["rounds"][game["current_round"]]
@@ -105,6 +106,7 @@ class GameManager:
             del current["questions"][key]
         game["current_question"] = None
         game["answered_players"] = []
+        game["answering_name"] = ""
         await self._check_round_complete(room_code)
         await self.broadcast_game_state(room_code)
 
@@ -280,13 +282,9 @@ class GameManager:
                 room["players"][answering]["score"] += price
                 game["last_correct_player"] = answering
                 game["current_selector"] = answering
-                key = f"{game['current_question']['category']}_{price}"
-                if key in game["rounds"][game["current_round"]]["questions"]:
-                    del game["rounds"][game["current_round"]]["questions"][key]
-                game["current_question"] = None
+                game["current_question"]["status"] = "answered"
                 game["answered_players"] = []
                 game["answering_name"] = ""
-                await self._check_round_complete(room_code)
             else:
                 room["players"][answering]["score"] -= price
                 game["current_question"]["status"] = "open"
