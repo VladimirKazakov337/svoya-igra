@@ -167,6 +167,14 @@ class GameManager:
             await self._handle_answer_attempt(room_code, player_id, message)
         elif msg_type == "evaluate_answer":
             await self._handle_evaluate_answer(room_code, player_id, message)
+        elif msg_type == "final_bet":
+            await self._handle_final_bet(room_code, player_id, message)
+        elif msg_type == "show_final_question":
+            await self._handle_show_final_question(room_code, player_id, message)
+        elif msg_type == "final_answer":
+            await self._handle_final_answer(room_code, player_id, message)
+        elif msg_type == "final_results":
+            await self._handle_final_results(room_code, player_id, message)
         elif msg_type == "ping":
             await self.send_to_player(room_code, player_id, {"type": "pong"})
 
@@ -223,8 +231,8 @@ class GameManager:
                         }
                 prices = [q["price"] for q in tr["categories"][0]["questions"]]
                 rounds.append({"name": tr["name"], "prices": prices, "categories": [c["name"] for c in tr["categories"]], "questions": questions})
-            return {"current_round": 0, "current_question": None, "answered_players": [], "last_correct_player": None, "phase": "playing", "rounds": rounds, "final": template.get("final", []), "current_selector": None}
-        return {"current_round": 0, "current_question": None, "answered_players": [], "phase": "playing", "rounds": [], "final": [], "current_selector": None}
+            return {"current_round": 0, "current_question": None, "answered_players": [], "last_correct_player": None, "phase": "playing", "rounds": rounds, "final": template.get("final", []), "current_selector": None, "answering_name": "", "final_bets": {}, "final_answers": {}}
+        return {"current_round": 0, "current_question": None, "answered_players": [], "phase": "playing", "rounds": [], "final": [], "current_selector": None, "answering_name": "", "final_bets": {}, "final_answers": {}}
 
     async def _handle_select_question(self, room_code, player_id, message):
         game = self.games.get(room_code)
@@ -329,7 +337,74 @@ class GameManager:
                 await self.broadcast_game_state(room_code)
             else:
                 game["phase"] = "final"
+                game["final_phase"] = ""
                 await self.broadcast_game_state(room_code)
+
+    async def _handle_final_bet(self, room_code, player_id, message):
+        game = self.games.get(room_code)
+        room = self.rooms[room_code]
+        if not game or game["phase"] != "final":
+            return
+        bet = message.get("bet", 0)
+        if 0 <= bet <= max(0, room["players"][player_id]["score"]):
+            game["final_bets"][player_id] = bet
+            room["players"][player_id]["has_bet"] = True
+            # Send only to host
+            await self._send_final_update(room_code)
+
+    async def _handle_show_final_question(self, room_code, player_id, message):
+        game = self.games.get(room_code)
+        room = self.rooms[room_code]
+        if not game or player_id != room["host"]:
+            return
+        action = message.get("action", "betting")
+        game["final_phase"] = action
+        # Send to players only, not host
+        for pid, p in room["players"].items():
+            if p.get("is_host"): continue
+            try:
+                players_info = {}
+                for pid2, p2 in room["players"].items():
+                    players_info[pid2] = {"name": p2["name"], "score": p2["score"], "has_bet": p2.get("has_bet", False), "has_answered": p2.get("has_answered", False), "is_host": False}
+                await p["websocket"].send_json({"type": "game_state", "game": game, "players": players_info, "host_name": room.get("host_name", "")})
+            except: pass
+
+    async def _handle_final_answer(self, room_code, player_id, message):
+        game = self.games.get(room_code)
+        room = self.rooms[room_code]
+        if not game or game["phase"] != "final":
+            return
+        game["final_answers"][player_id] = message.get("answer", "")
+        room["players"][player_id]["has_answered"] = True
+        await self._send_final_update(room_code)
+
+    async def _handle_final_results(self, room_code, player_id, message):
+        game = self.games.get(room_code)
+        room = self.rooms[room_code]
+        if not game or player_id != room["host"]:
+            return
+        results = message.get("results", {})
+        for pid, correct in results.items():
+            if pid in room["players"] and not room["players"][pid].get("is_host"):
+                bet = game["final_bets"].get(pid, 0)
+                if correct:
+                    room["players"][pid]["score"] += bet
+                else:
+                    room["players"][pid]["score"] -= bet
+        await self.broadcast_game_state(room_code)
+
+    async def _send_final_update(self, room_code):
+        game = self.games.get(room_code)
+        room = self.rooms[room_code]
+        if not game: return
+        players_info = {}
+        for pid, p in room["players"].items():
+            players_info[pid] = {"name": p["name"], "score": p["score"], "has_bet": p.get("has_bet", False), "has_answered": p.get("has_answered", False)}
+        host_id = room.get("host")
+        if host_id and host_id in room["players"]:
+            try:
+                await room["players"][host_id]["websocket"].send_json({"type": "final_update", "players": players_info, "final_bets": game.get("final_bets", {}), "final_answers": game.get("final_answers", {})})
+            except: pass
 
     async def broadcast_room_state(self, room_code: str):
         if room_code not in self.rooms:
@@ -356,13 +431,13 @@ class GameManager:
             return
         players_info = {}
         for pid, p in room["players"].items():
-            players_info[pid] = {"name": p["name"], "score": p["score"], "can_answer": p.get("can_answer", False), "is_host": False}
+            players_info[pid] = {"name": p["name"], "score": p["score"], "can_answer": p.get("can_answer", False), "is_host": False, "has_bet": p.get("has_bet", False), "has_answered": p.get("has_answered", False)}
         sel_id = game.get("current_selector")
         sel_name = room["players"][sel_id]["name"] if sel_id and sel_id in room["players"] else ""
         print(f"Broadcasting game_state to {len(room['players'])} players: {list(room['players'].keys())}, selector={sel_name}")
         for pid, player in room["players"].items():
             try:
-                state = {"type": "game_state", "game": game, "players": players_info, "current_player": pid, "current_selector": sel_id, "selector_name": sel_name, "host_name": room.get("host_name", ""), "answering_name": game.get("answering_name", "")}
+                state = {"type": "game_state", "game": game, "players": players_info, "current_player": pid, "current_selector": sel_id, "selector_name": sel_name, "host_name": room.get("host_name", ""), "answering_name": game.get("answering_name", ""), "final_phase": game.get("final_phase", "")}
                 await player["websocket"].send_json(state)
                 print(f"Sent game_state to {pid}")
             except Exception as e:

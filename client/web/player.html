@@ -1,166 +1,173 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8"><title>Своя Игра - Игрок</title>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Svoya Igra - Player</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial;background:#1a1a2e;color:white;height:100vh;display:flex;align-items:center;justify-content:center}
-.container{text-align:center;padding:20px;max-width:400px;width:100%}
-.screen{display:none}
+body{font-family:Arial;background:#1a1a2e;color:white;height:100vh;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.screen{display:none;text-align:center;width:100%;padding:20px}
 .screen.active{display:block}
-input{padding:15px;margin:10px 0;border-radius:10px;border:1px solid #555;background:#2a2a4a;color:white;font-size:18px;width:100%}
-button{padding:15px 30px;margin:10px 0;border-radius:10px;border:none;font-size:18px;cursor:pointer;width:100%;font-weight:bold}
-.blue{background:#007bff;color:white}
-.green{background:#28a745;color:white}
-.red{background:#dc3545;color:white}
-.orange{background:#ff9800;color:white}
-.gray{background:#555;color:white;cursor:not-allowed}
-.waiting-text{font-size:20px;margin:20px 0;color:#aaa}
-.answer-btn{padding:30px;font-size:28px;border-radius:20px;transition:all 0.3s}
-.answer-btn:disabled{background:#555;color:#888;cursor:not-allowed}
-.answer-btn.active{background:#28a745;color:white;animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
-.score{font-size:48px;font-weight:bold;margin:20px 0}
-.score.positive{color:#28a745}
-.score.negative{color:#dc3545}
-.status{font-size:18px;margin:15px 0;padding:10px;border-radius:10px}
-.status.waiting{background:#555}
-.status.ready{background:#28a745;animation:pulse 1s infinite}
+input{padding:15px;margin:10px 0;border-radius:10px;border:1px solid #555;background:#2a2a4a;color:white;font-size:18px;width:100%;max-width:300px}
+.btn{padding:15px 30px;border:none;border-radius:10px;font-size:18px;font-weight:bold;cursor:pointer;width:100%;max-width:300px}
+.btn-blue{background:#007bff;color:white}.btn-green{background:#28a745;color:white}
+.score{font-size:60px;font-weight:bold;margin:20px 0}
+.answer-btn{width:220px;height:220px;border-radius:50%;border:none;font-size:28px;font-weight:bold;cursor:pointer;transition:all 0.3s;margin:30px auto}
+.answer-btn.waiting{background:#555;color:#888;cursor:not-allowed}
+.answer-btn.active{background:#28a745;color:white;animation:pulse 1s infinite;box-shadow:0 0 40px #28a745}
+.answer-btn.pressed{background:#ff9800;color:black}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.status{font-size:22px;margin:20px 0;padding:15px;border-radius:10px}
+.status.waiting{background:#555}.status.ready{background:#28a745;animation:pulse 1s infinite}
 .status.answered{background:#ff9800}
 </style>
 </head>
 <body>
-<div class="container">
-    <div id="login-screen" class="screen active">
-        <h1>Присоединиться</h1>
-        <input id="room-input" placeholder="Код комнаты" maxlength="6" autocomplete="off">
-        <input id="name-input" placeholder="Ваше имя" autocomplete="off">
-        <button class="blue" onclick="joinGame()">Войти</button>
-        <p id="error" style="color:#dc3545;margin-top:10px"></p>
-    </div>
 
-    <div id="waiting-screen" class="screen">
-        <h2>Ожидание игры</h2>
-        <p class="waiting-text">Код: <b id="room-display"></b></p>
-        <p class="waiting-text" id="waiting-info"></p>
-    </div>
+<div id="login" class="screen active">
+<h1>Join Game</h1>
+<input id="room" placeholder="Room code" maxlength="6" autocomplete="off">
+<input id="name" placeholder="Your name" autocomplete="off">
+<button class="btn btn-blue" onclick="join()">Join</button>
+<p id="err" style="color:#dc3545;margin-top:10px"></p>
+</div>
 
-    <div id="game-screen" class="screen">
-        <h3 id="player-name-display"></h3>
-        <div class="score" id="my-score">0</div>
-        <div class="status waiting" id="game-status">Ожидание...</div>
-        <button class="answer-btn gray" id="answer-btn" disabled onclick="attemptAnswer()">ОТВЕТИТЬ</button>
-        <p style="color:#aaa;margin-top:20px;font-size:14px" id="info-text"></p>
-    </div>
+<div id="waiting" class="screen">
+<h2>Waiting for game...</h2>
+<p>Room: <b id="wroom"></b></p>
+<p id="wplayers"></p>
+</div>
+
+<div id="game" class="screen">
+<div class="score" id="myscore">0</div>
+<div class="status waiting" id="status">Waiting...</div>
+<div id="bet-area" style="display:none">
+  <h3>FINAL - Place your bet</h3>
+  <p style="color:#aaa">Max: <span id="max-bet"></span></p>
+  <input type="number" id="bet-input" placeholder="Your bet" min="0" style="font-size:24px;text-align:center;width:200px">
+  <br><button class="btn btn-green" onclick="placeBet()">SUBMIT BET</button>
+</div>
+<div id="final-answer-area" style="display:none">
+  <h3>FINAL - Your answer</h3>
+  <input id="final-answer" placeholder="Your answer" style="font-size:20px;width:90%">
+  <br><button class="btn btn-green" onclick="submitFinalAnswer()">SUBMIT ANSWER</button>
+</div>
+<button class="answer-btn waiting" id="ansbtn" disabled onclick="answer()">ANSWER</button>
 </div>
 
 <script>
-var ws, roomCode, playerId, myName;
+var ws, room, pid, myName;
 
-function joinGame() {
-    roomCode = document.getElementById('room-input').value.trim().toUpperCase();
-    myName = document.getElementById('name-input').value.trim();
-    if (!roomCode || !myName) { document.getElementById('error').textContent = 'Введите код и имя'; return; }
-    
-    playerId = Math.random().toString(36).substr(2,8);
-    ws = new WebSocket('ws://' + window.location.hostname + ':8000/ws/' + roomCode + '/' + playerId);
-    
-    ws.onopen = function() {
-        ws.send(JSON.stringify({type:'join', name:myName}));
-        document.getElementById('room-display').textContent = roomCode;
-        showScreen('waiting-screen');
-    };
-    
-    ws.onmessage = function(event) {
-        var msg = JSON.parse(event.data);
-        
-        if (msg.type === 'room_state') {
-            var count = msg.players_count || 0;
-            document.getElementById('waiting-info').textContent = 'Игроков: ' + count + '/5';
-        }
-        
-        if (msg.type === 'game_state') {
-            showScreen('game-screen');
-            updatePlayerUI(msg);
-        }
-        
-        if (msg.type === 'error') {
-            document.getElementById('error').textContent = msg.message;
-        }
-    };
-    
-    ws.onclose = function() {
-        document.getElementById('error').textContent = 'Соединение закрыто';
-        showScreen('login-screen');
-    };
-}
-
-function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
-    document.getElementById(id).classList.add('active');
-}
-
-function updatePlayerUI(msg) {
-    var players = msg.players;
-    var me = players[playerId];
-    var game = msg.game;
-    
-    // Имя и счёт
-    document.getElementById('player-name-display').textContent = myName;
-    var scoreEl = document.getElementById('my-score');
-    scoreEl.textContent = (me ? me.score : 0);
-    scoreEl.className = 'score ' + ((me && me.score >= 0) ? 'positive' : 'negative');
-    
-    // Статус и кнопка
-    var statusEl = document.getElementById('game-status');
-    var btn = document.getElementById('answer-btn');
-    var info = document.getElementById('info-text');
-    
-    var q = game.current_question;
-    
-    if (!q) {
-        statusEl.textContent = 'Ожидание вопроса...';
-        statusEl.className = 'status waiting';
-        btn.disabled = true;
-        btn.className = 'answer-btn gray';
-        info.textContent = '';
-    } else if (q.status === 'selected') {
-        statusEl.textContent = 'Ведущий читает вопрос...';
-        statusEl.className = 'status waiting';
-        btn.disabled = true;
-        btn.className = 'answer-btn gray';
-        info.textContent = q.category + ' - ' + q.price;
-    } else if (q.status === 'open') {
-        if (me && me.can_answer) {
-            statusEl.textContent = 'МОЖЕТЕ ОТВЕЧАТЬ!';
-            statusEl.className = 'status ready';
-            btn.disabled = false;
-            btn.className = 'answer-btn active';
-            info.textContent = q.category + ' - ' + q.price;
-        } else {
-            statusEl.textContent = 'Кто-то отвечает...';
-            statusEl.className = 'status waiting';
-            btn.disabled = true;
-            btn.className = 'answer-btn gray';
-            info.textContent = '';
-        }
-    } else if (q.status === 'answering') {
-        statusEl.textContent = 'Идёт ответ...';
-        statusEl.className = 'status answered';
-        btn.disabled = true;
-        btn.className = 'answer-btn gray';
-        info.textContent = '';
+function join(){
+  room = document.getElementById('room').value.trim().toUpperCase();
+  myName = document.getElementById('name').value.trim();
+  if(!room||!myName){document.getElementById('err').textContent='Enter code and name';return}
+  pid = Math.random().toString(36).substr(2,8);
+  ws = new WebSocket('ws://'+window.location.hostname+':8000/ws/'+room+'/'+pid);
+  ws.onopen = function(){ ws.send(JSON.stringify({type:'join',name:myName})); };
+  ws.onmessage = function(ev){
+    var msg = JSON.parse(ev.data);
+    if(msg.type==='room_state'){
+      show('waiting');
+      document.getElementById('wroom').textContent = room;
+      document.getElementById('wplayers').textContent = 'Players: '+msg.players_count+'/5';
     }
+    if(msg.type==='game_state'){ show('game'); update(msg); }
+  };
+  ws.onclose = function(){ show('login'); document.getElementById('err').textContent='Disconnected'; };
 }
 
-function attemptAnswer() {
-    ws.send(JSON.stringify({type:'answer_attempt'}));
-    var btn = document.getElementById('answer-btn');
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.getElementById(id).classList.add('active');
+}
+
+function update(msg){ document.title = msg.game.phase; 
+  var players = msg.players, game = msg.game, me = players[pid];
+  if(!me){ console.log('Player not found in players', pid, Object.keys(players)); return; }
+  document.getElementById('myscore').textContent = me.score;
+  
+  // FINAL ROUND
+  if(game.phase === 'final' && game.final_phase){
+    var fp = game.final_phase || 'betting';
+    document.getElementById('ansbtn').style.display = 'none';
+    if(fp === 'betting' && !me.has_bet){
+      document.getElementById('bet-area').style.display = 'block';
+      document.getElementById('final-answer-area').style.display = 'none';
+      document.getElementById('status').textContent = 'Place your bet';
+      document.getElementById('max-bet').textContent = me.score;
+      document.getElementById('bet-input').max = me.score;
+    } else if(fp === 'answering' && !me.has_answered){
+      document.getElementById('bet-area').style.display = 'none';
+      document.getElementById('final-answer-area').style.display = 'block';
+      document.getElementById('status').textContent = 'Enter your final answer';
+    } else {
+      document.getElementById('bet-area').style.display = 'none';
+      document.getElementById('final-answer-area').style.display = 'none';
+      document.getElementById('status').textContent = 'Waiting for results...';
+    }
+    return;
+  }
+  
+  // REGULAR GAME
+  document.getElementById('bet-area').style.display = 'none';
+  document.getElementById('final-answer-area').style.display = 'none';
+  document.getElementById('ansbtn').style.display = 'block';
+  
+  var q = game.current_question;
+  var btn = document.getElementById('ansbtn');
+  var st = document.getElementById('status');
+  
+  if(!q){
+    st.textContent = 'Waiting for question...';
+    st.className = 'status waiting';
+    btn.className = 'answer-btn waiting';
     btn.disabled = true;
-    btn.className = 'answer-btn gray';
-    document.getElementById('game-status').textContent = 'Ответ отправлен!';
-    document.getElementById('game-status').className = 'status answered';
+  } else if(q.status==='selected'){
+    st.textContent = 'Host is reading...';
+    st.className = 'status waiting';
+    btn.className = 'answer-btn waiting';
+    btn.disabled = true;
+  } else if(q.status==='open'){
+    if(me.can_answer){
+      st.textContent = 'PRESS TO ANSWER!';
+      st.className = 'status ready';
+      btn.className = 'answer-btn active';
+      btn.disabled = false;
+    } else {
+      st.textContent = 'Someone is answering...';
+      st.className = 'status waiting';
+      btn.className = 'answer-btn waiting';
+      btn.disabled = true;
+    }
+  } else if(q.status==='answering'){
+    st.textContent = 'Answering...';
+    st.className = 'status answered';
+    btn.className = 'answer-btn pressed';
+    btn.disabled = true;
+  } else if(q.status==='answered'){
+    st.textContent = 'Correct!';
+    st.className = 'status answered';
+    btn.className = 'answer-btn pressed';
+    btn.disabled = true;
+  }
+}
+
+function answer(){ ws.send(JSON.stringify({type:'answer_attempt'})); }
+function placeBet(){
+  var bet = parseInt(document.getElementById('bet-input').value);
+  if(!bet || bet<0) return;
+  ws.send(JSON.stringify({type:'final_bet', bet:bet}));
+  document.getElementById('bet-area').style.display = 'none';
+  document.getElementById('status').textContent = 'Bet placed!';
+}
+function submitFinalAnswer(){
+  var ans = document.getElementById('final-answer').value;
+  if(!ans) return;
+  ws.send(JSON.stringify({type:'final_answer', answer:ans}));
+  document.getElementById('final-answer-area').style.display = 'none';
+  document.getElementById('status').textContent = 'Answer submitted!';
 }
 </script>
 </body>
