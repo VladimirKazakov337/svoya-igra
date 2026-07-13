@@ -157,7 +157,9 @@ function update(msg){ document.title = msg.game.phase;
 function answer(){ ws.send(JSON.stringify({type:'answer_attempt'})); }
 function placeBet(){
   var bet = parseInt(document.getElementById('bet-input').value);
-  if(!bet || bet<0) return;
+  var maxBet = parseInt(document.getElementById('bet-input').max) || 0;
+  if(isNaN(bet) || bet<0){ alert("Enter valid bet"); return; }
+  if(bet > maxBet){ alert("Max bet is "+maxBet); return; }
   ws.send(JSON.stringify({type:'final_bet', bet:bet}));
   document.getElementById('bet-area').style.display = 'none';
   document.getElementById('status').textContent = 'Bet placed!';

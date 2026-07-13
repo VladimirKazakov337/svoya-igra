@@ -391,7 +391,13 @@ class GameManager:
                     room["players"][pid]["score"] += bet
                 else:
                     room["players"][pid]["score"] -= bet
-        await self.broadcast_game_state(room_code)
+        # Send final scores back
+        final_scores = {}
+        for pid, p in room["players"].items():
+            if not p.get("is_host"):
+                final_scores[pid] = {"name": p["name"], "score": p["score"]}
+        if player_id in room["players"]:
+                    await room["players"][player_id]["websocket"].send_json({"type": "final_scores", "scores": final_scores})
 
     async def _send_final_update(self, room_code):
         game = self.games.get(room_code)

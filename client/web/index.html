@@ -137,7 +137,7 @@ async function loadDrafts(){var r=await fetch('/api/drafts');var d=await r.json(
 async function openDraft(id){var r=await fetch('/api/draft/load',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})});var d=await r.json();if(d.template){T=d.template;showEditor();document.getElementById('gameName').value=T.name||'';switchRound(0)}}
 async function saveDraft(){T.name=document.getElementById('gameName').value||'My Game';var did=Math.random().toString(36).substr(2,8);await fetch('/api/draft/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:did,template:T})});alert('Draft saved!')}
 
-async function startGame(){T.name=document.getElementById('gameName').value||'My Game';var r=await fetch('/api/create_room',{method:'POST'});var d=await r.json();roomCode=d.room_code;await fetch('/api/save_template/'+roomCode,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(T)});playerId=Math.random().toString(36).substr(2,8);window.window.ws=new WebSocket('ws://'+window.location.hostname+':8000/ws/'+roomCode+'/'+playerId);window.ws.onopen=function(){window.ws.send(JSON.stringify({type:'join',name:document.getElementById('hostName').value||'Host'}))};joined=false;window.window.ws.onmessage=function(ev){var msg=JSON.parse(ev.data); if(msg.type==='final_update'){updateFinalOverlay(msg);return;}
+async function startGame(){T.name=document.getElementById('gameName').value||'My Game';var r=await fetch('/api/create_room',{method:'POST'});var d=await r.json();roomCode=d.room_code;await fetch('/api/save_template/'+roomCode,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(T)});playerId=Math.random().toString(36).substr(2,8);window.window.ws=new WebSocket('ws://'+window.location.hostname+':8000/ws/'+roomCode+'/'+playerId);window.ws.onopen=function(){window.ws.send(JSON.stringify({type:'join',name:document.getElementById('hostName').value||'Host'}))};joined=false;window.window.ws.onmessage=function(ev){var msg=JSON.parse(ev.data); if(msg.type==='final_scores'){showFinalResults(msg.scores);return;} if(msg.type==='final_update'){updateFinalOverlay(msg);return;}
   if(msg.type==='game_state'){document.getElementById('lobby-screen').style.display='none';document.getElementById('game-screen').style.display='flex';renderGame(msg);return}
   if(msg.type==='room_state'){if(!joined){window.ws.send(JSON.stringify({type:"set_creator"}));joined=true;return}document.getElementById('editor-screen').style.display='none';document.getElementById('lobby-screen').style.display='block';document.getElementById('rcode').textContent=roomCode;document.getElementById('rcodebig').textContent=roomCode;var h='<h3>Players ('+msg.players_count+'/5):</h3>';h+='<p>Host: <b>'+(msg.host_name||'Host')+'</b></p>';for(var id in msg.players){var p=msg.players[id];if(!p.is_host)h+='<div style="padding:8px;background:#2a2a4a;border-radius:5px;margin:3px">'+p.name+'</div>'}if(!msg.players_count)h+='<p style="color:#aaa">Waiting...</p>';document.getElementById('lplayers').innerHTML=h;document.getElementById('btn-start-game').style.display='inline-block'}}}
 function launchGame(){window.ws.send(JSON.stringify({type:"start_game"}));document.getElementById('btn-start-game').textContent='Starting...';document.getElementById('btn-start-game').disabled=true}
@@ -291,7 +291,7 @@ function goToAnswering(){
   window._gameState.game.final_phase = "answering";
   if(window._finalTheme) showFinalQuestion(window._finalTheme.index);
 }
-function updateFinalOverlay(msg){ if(window._gameState){ window._gameState.game.final_bets = msg.final_bets || window._gameState.game.final_bets; window._gameState.game.final_answers = msg.final_answers || window._gameState.game.final_answers; }
+function updateFinalOverlay(msg){ if(msg.final_bets) window._gameState.game.final_bets = msg.final_bets; if(msg.final_answers) window._gameState.game.final_answers = msg.final_answers; if(window._gameState){ window._gameState.game.final_bets = msg.final_bets || window._gameState.game.final_bets; window._gameState.game.final_answers = msg.final_answers || window._gameState.game.final_answers; }
   var sd = document.getElementById('final-status');
   if(!sd) return;
   var info = '';
@@ -326,6 +326,20 @@ function showFinalAnswer(){
 function applyFinalResults(){
   window.ws.send(JSON.stringify({type:"final_results", results:window._fc}));
   document.getElementById('overlay').style.display = 'none';
+}
+
+function showFinalResults(scores){
+  var sorted = [];
+  for(var id in scores){ sorted.push({name:scores[id].name, score:scores[id].score}); }
+  sorted.sort(function(a,b){return b.score - a.score});
+  var h = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;text-align:center"><div>';
+  h += '<h1 style="font-size:48px;margin-bottom:40px">RESULTS</h1>';
+  for(var i=0;i<sorted.length;i++){
+    h += '<div style="font-size:'+(i===0?'52px':'36px')+';font-weight:bold;color:'+(i===0?'#ff9800':'#fff')+';margin:15px 0">'+sorted[i].name+': '+sorted[i].score+'</div>';
+  }
+  h += '</div></div>';
+  document.getElementById('game-screen').innerHTML = h;
+  document.getElementById('game-screen').style.display = 'flex';
 }
 </script>
 </body>
