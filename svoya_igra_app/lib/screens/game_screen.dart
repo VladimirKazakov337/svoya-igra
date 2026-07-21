@@ -21,6 +21,8 @@ class _GameScreenState extends State<GameScreen> {
   List<Map<String, dynamic>> _finalThemes = [];
   Map<String, dynamic>? _finalTheme;
   String _finalPhase = '';
+  Map<String, bool> _finalCorrect = {};
+  bool _showFinalAnswerTable = false;
 
   @override
   void initState() {
@@ -91,11 +93,10 @@ class _GameScreenState extends State<GameScreen> {
     setState(() {});
   }
 
-  void _allowBets() => _send('show_final_question', {'action': 'betting'});
-  void _goToAnswering() => _send('show_final_question', {'action': 'answering'});
+  void _allowBets() { _send('show_final_question', {'action': 'betting'}); setState(() => _finalPhase = 'betting'); }
+  void _goToAnswering() { _send('show_final_question', {'action': 'answering'}); setState(() => _finalPhase = 'answering'); }
   void _applyFinalResults() {
-    final fc = <String, bool>{};
-    _send('final_results', {'results': fc});
+    _send('final_results', {'results': _finalCorrect});
   }
 
   void _showFinalResults(Map scores) {
