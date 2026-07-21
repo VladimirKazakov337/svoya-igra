@@ -32,7 +32,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
 
 @app.get("/player.html")
 async def player_page():
-    html_path = os.path.join(os.path.dirname(__file__), "..", "client", "web", "player.html")
+    html_path = os.path.join(os.path.dirname(__file__), "..", "web", "player.html")
     if os.path.exists(html_path):
         with open(html_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
@@ -40,7 +40,7 @@ async def player_page():
 
 @app.get("/")
 async def root():
-    html_path = os.path.join(os.path.dirname(__file__), "..", "client", "web", "index.html")
+    html_path = os.path.join(os.path.dirname(__file__), "..", "web", "index.html")
     if os.path.exists(html_path):
         with open(html_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
