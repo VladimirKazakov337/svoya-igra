@@ -1,5 +1,6 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File
 from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 import os
 import shutil
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,6 +17,10 @@ UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app = FastAPI(title="Svoya Igra API")
+BASE_DIR = Path(__file__).resolve().parent.parent
+ASSETS_DIR = BASE_DIR / "web" / "assets"
+
+app.mount("/web/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
 # Serve uploaded files
 @app.post("/api/upload")
