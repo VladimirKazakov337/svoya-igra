@@ -89,7 +89,7 @@ body{font-family:Arial;background:#1a1a2e;color:white;min-height:100vh}
 
 <!-- LOBBY -->
 <div id="lobby-screen" style="display:none;text-align:center;padding-top:25vh">
-<h1>Room: <span id="rcode"></span></h1><h2 style="font-size:48px;letter-spacing:8px;margin:20px 0" id="rcodebig"></h2>
+<h2 style="font-size:48px;letter-spacing:8px;margin:20px 0" id="rcodebig"></h2>
 <div id="lplayers"></div>
 <button class="btn btn-green" id="btn-start-game" style="font-size:20px;padding:15px 40px;margin-top:20px" onclick="launchGame()">START GAME</button>
 </div>
@@ -149,7 +149,7 @@ async function saveDraft(){T.name=document.getElementById('gameName').value||'My
 
 async function startGame(){T.name=document.getElementById('gameName').value||'My Game';var r=await fetch('/api/create_room',{method:'POST'});var d=await r.json();roomCode=d.room_code;await fetch('/api/save_template/'+roomCode,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(T)});playerId=Math.random().toString(36).substr(2,8);window.window.ws=new WebSocket('ws://'+window.location.hostname+':8000/ws/'+roomCode+'/'+playerId);window.ws.onopen=function(){window.ws.send(JSON.stringify({type:'join',name:document.getElementById('hostName').value||'Host'}))};joined=false;window.window.ws.onmessage=function(ev){var msg=JSON.parse(ev.data); if(msg.type==='final_scores'){showFinalResults(msg.scores);return;} if(msg.type==='final_update'){updateFinalOverlay(msg);return;}
   if(msg.type==='game_state'){document.getElementById('lobby-screen').style.display='none';document.getElementById('game-screen').style.display='flex';renderGame(msg);return}
-  if(msg.type==='room_state'){if(!joined){window.ws.send(JSON.stringify({type:"set_creator"}));joined=true;return}document.getElementById('editor-screen').style.display='none';document.getElementById('lobby-screen').style.display='block';document.getElementById('rcode').textContent=roomCode;document.getElementById('rcodebig').textContent=roomCode;var h='<h3>Players ('+msg.players_count+'/5):</h3>';h+='<p>Host: <b>'+(msg.host_name||'Host')+'</b></p>';for(var id in msg.players){var p=msg.players[id];if(!p.is_host)h+='<div style="padding:8px;background:#2a2a4a;border-radius:5px;margin:3px">'+p.name+'</div>'}if(!msg.players_count)h+='<p style="color:#aaa">Waiting...</p>';document.getElementById('lplayers').innerHTML=h;document.getElementById('btn-start-game').style.display='inline-block'}}}
+  if(msg.type==='room_state'){if(!joined){window.ws.send(JSON.stringify({type:"set_creator"}));joined=true;return}document.getElementById('editor-screen').style.display='none';document.getElementById('lobby-screen').style.display='block';document.getElementById('rcodebig').textContent=roomCode;var h='<h3>Players ('+msg.players_count+'/5):</h3>';h+='<p>Host: <b>'+(msg.host_name||'Host')+'</b></p>';for(var id in msg.players){var p=msg.players[id];if(!p.is_host)h+='<div style="padding:8px;background:#2a2a4a;border-radius:5px;margin:3px">'+p.name+'</div>'}if(!msg.players_count)h+='<p style="color:#aaa">Waiting...</p>';document.getElementById('lplayers').innerHTML=h;document.getElementById('btn-start-game').style.display='inline-block'}}}
 function launchGame(){window.ws.send(JSON.stringify({type:"start_game"}));document.getElementById('btn-start-game').textContent='Starting...';document.getElementById('btn-start-game').disabled=true}
 
 // ========== GAME RENDER ==========
@@ -177,13 +177,13 @@ function renderGame(msg){ window._gameState = msg;
     document.getElementById('btn-next').style.display='none';
     document.getElementById('overlay').style.display='none';
     // Update scores
-    var ph2='';for(var id in players){var p=players[id];if(p.is_host||p.name===msg.host_name)continue;ph2+='<div class="player-badge"><div class="pname">'+p.name+'</div><div class="pscore '+(p.score>=0?'plus':'minus')+'">'+p.score+'</div></div>'} document.getElementById('gplayers').innerHTML=ph2;
+    var ph2='';for(var id in players){var p=players[id];if(p.is_host||p.name===msg.host_name)continue;ph2+='<div class="player-badge" style="'+(p.online===false?'opacity:0.5':'')+'"><div class="pname">'+p.name+'</div><div class="pscore '+(p.score>=0?'plus':'minus')+'">'+p.score+'</div></div>'} document.getElementById('gplayers').innerHTML=ph2;
     return;
   }
   var round=game.rounds[game.current_round];
   document.getElementById('rname').textContent=round.name+' ('+(game.current_round+1)+'/3)';
   document.getElementById('hname-display').textContent=msg.host_name||'';
-  var ph='';for(var id in players){var p=players[id];if(p.is_host||p.name===msg.host_name)continue;ph+='<div class="player-badge"><div class="pname">'+p.name+'</div><div class="pscore '+(p.score>=0?'plus':'minus')+'">'+p.score+'</div></div>'}
+  var ph='';for(var id in players){var p=players[id];if(p.is_host||p.name===msg.host_name)continue;ph+='<div class="player-badge" style="'+(p.online===false?'opacity:0.5':'')+'"><div class="pname">'+p.name+'</div><div class="pscore '+(p.score>=0?'plus':'minus')+'">'+p.score+'</div></div>'}
   document.getElementById('gplayers').innerHTML=ph;
   var bh='';for(var j=0;j<round.categories.length;j++)bh+='<div class="bcell head">'+round.categories[j]+'</div>';
   for(var i=0;i<round.prices.length;i++){for(var j=0;j<round.categories.length;j++){var cat=round.categories[j],price=round.prices[i],key=cat+'_'+price,exists=round.questions[key],q=game.current_question,sel=q&&q.category===cat&&q.price===price;
