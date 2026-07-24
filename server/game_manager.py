@@ -144,7 +144,9 @@ class GameManager:
             if game and room["status"] == "playing":
                 if player_id in room["players"]:
                     room["players"][player_id]["websocket"] = None  # Mark offline
-                # Don't delete - keep in frozen list
+                # Broadcast to update online status on frontend
+                await self.broadcast_game_state(room_code)
+                return
             else:
                 if player_id in room["players"]:
                     del room["players"][player_id]
@@ -222,13 +224,16 @@ class GameManager:
                     "has_bet": old_has_bet,
                     "has_answered": old_has_answered,
                 }
-                # Remove ALL old entries for this player name from game["players"]
+                # Remove ALL old entries for this player name from both game["players"] and room["players"]
                 to_delete = []
+                name_lower = name.lower().strip()
                 for pid, p in list(game["players"].items()):
-                    if p["name"] == name and pid != player_id:
+                    if p["name"].lower().strip() == name_lower and pid != player_id:
                         to_delete.append(pid)
                 for pid in to_delete:
                     del game["players"][pid]
+                    if pid in room["players"]:
+                        del room["players"][pid]
                     if pid in game.get("final_bets", {}):
                         game["final_bets"][player_id] = game["final_bets"].pop(pid)
                     if pid in game.get("final_answers", {}):
@@ -550,7 +555,7 @@ class GameManager:
         else:
             players_info = {}
             for pid, p in room["players"].items():
-                players_info[pid] = {"name": p["name"], "score": p["score"], "can_answer": p.get("can_answer", False), "is_host": False, "has_bet": p.get("has_bet", False), "has_answered": p.get("has_answered", False)}
+                players_info[pid] = {"name": p["name"], "score": p["score"], "can_answer": p.get("can_answer", False), "is_host": False, "has_bet": p.get("has_bet", False), "has_answered": p.get("has_answered", False), "online": pid in room["players"] and room["players"][pid].get("websocket") is not None}
         sel_id = game.get("current_selector")
         sel_name = room["players"][sel_id]["name"] if sel_id and sel_id in room["players"] else game["players"].get(sel_id, {}).get("name", "") if "players" in game else ""
         print(f"Broadcasting game_state to {len(room['players'])} players: {list(room['players'].keys())}, selector={sel_name}")
