@@ -28,6 +28,11 @@ input{padding:15px;margin:10px 0;border-radius:10px;border:1px solid #555;backgr
 <div id="login" class="screen active">
 <h1>Join Game</h1>
 <input id="room" placeholder="Room code" maxlength="6" autocomplete="off">
+<script>
+  var params = new URLSearchParams(window.location.search);
+  var roomFromUrl = params.get('room');
+  if(roomFromUrl) document.getElementById('room').value = roomFromUrl;
+</script>
 <input id="name" placeholder="Your name" autocomplete="off">
 <button class="btn btn-blue" onclick="join()">Join</button>
 <p id="err" style="color:#dc3545;margin-top:10px"></p>
