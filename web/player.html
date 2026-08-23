@@ -663,6 +663,21 @@ body::after {
   position: relative;
   z-index: 3;  /* Выше мышей */
 }
+
+/* ============ БЕГЕМОТ НА ЭКРАНЕ ОЖИДАНИЯ ============ */
+.hippo-spinner {
+  display: block;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 20px;
+}
+
+@media (max-width: 600px) {
+  .hippo-spinner {
+    width: 110px;
+    height: 110px;
+  }
+}
 </style>
 </head>
 <body>
@@ -690,6 +705,7 @@ body::after {
 
 <!-- ЭКРАН ОЖИДАНИЯ -->
 <div id="waiting" class="screen">
+  <img src="assets/hippo.png" alt="Бегемот" class="hippo-spinner">
   <div class="player-card">
     <h2>Ожидание игры...</h2>
     <p>Код комнаты:</p>
